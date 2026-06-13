@@ -92,11 +92,7 @@ class UserManager(BaseUserManager):
 
 
 
-        user.save(
-            using=self._db
-        )
-
-
+        user.save(using=self._db)
         return user
 
 
@@ -106,10 +102,7 @@ class UserManager(BaseUserManager):
 # Custom User Model
 
 
-class User(
-    AbstractBaseUser,
-    PermissionsMixin
-):
+class User(AbstractBaseUser,PermissionsMixin):
 
 
     GENDER_CHOICES = (

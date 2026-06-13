@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+
+
+{% block title %}
+
+Login
+
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+<div class="container mt-5">
+
+
+<div class="row justify-content-center">
+
+
+<div class="col-md-5">
+
+
+<div class="card shadow">
+
+
+<div class="card-header bg-primary text-white">
+
+
+<h4 class="text-center">
+
+Login
+
+</h4>
+
+
+</div>
+
+
+
+
+<div class="card-body">
+
+
+<form method="POST">
+
+
+{% csrf_token %}
+
+
+
+<div class="mb-3">
+
+
+<label class="form-label">
+
+Username or email
+
+</label>
+
+
+<input
+
+type="text"
+
+name="login_input"
+
+class="form-control"
+
+placeholder="Enter username or email"
+
+required>
+
+
+</div>
+
+
+
+
+<div class="mb-3">
+
+
+<label class="form-label">
+
+Password
+
+</label>
+
+
+<input
+
+type="password"
+
+name="password"
+
+class="form-control"
+
+placeholder="Enter password"
+
+required>
+
+
+</div>
+
+
+
+
+
+<button class="btn btn-primary w-100">
+
+
+Login
+
+
+</button>
+
+
+
+</form>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+{% endblock %}

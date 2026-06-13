@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+
+Home
+
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+<div class="container mt-5">
+
+
+    <div class="card shadow p-5 text-center">
+
+
+        <h1>
+            Welcome to Pickup
+        </h1>
+
+
+        <p class="lead">
+            Your online PickUp shopping platform
+        </p>
+
+
+        <a href="{% url 'register' %}" 
+        class="btn btn-primary">
+
+            Get Started
+
+        </a>
+
+
+    </div>
+
+
+</div>
+
+
+
+{% endblock %}

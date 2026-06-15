@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+My Profile - PickUp
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+<div class="container mt-5">
+
+
+<div class="card shadow p-5">
+
+
+<h2>
+My Profile
+</h2>
+
+
+
+<h5>
+Username:
+{{user.username}}
+</h5>
+
+
+<h5>
+Name:
+{{user.full_name}}
+</h5>
+
+
+<h5>
+Email:
+{{user.email}}
+</h5>
+
+
+</div>
+
+
+</div>
+
+
+{% endblock %}

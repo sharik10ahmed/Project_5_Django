@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+Cart - PickUp
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<div class="container mt-5">
+
+
+<h2>
+My Cart 🛒
+</h2>
+
+
+<div class="card shadow p-4 mt-3">
+
+
+<p>
+Your cart is empty.
+</p>
+
+
+<a href="{% url 'product' %}"
+class="btn btn-success">
+
+Shop Now
+
+</a>
+
+
+</div>
+
+
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+Wishlist - PickUp
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<div class="container mt-5">
+
+
+<h2>
+My Wishlist ❤️
+</h2>
+
+
+<div class="card shadow p-4 mt-3">
+
+
+<p>
+No products added to wishlist yet.
+</p>
+
+
+<a href="{% url 'product' %}"
+class="btn btn-primary">
+
+Explore Products
+
+</a>
+
+
+</div>
+
+
+</div>
+
+
+{% endblock %}

@@ -18,7 +18,6 @@ class UserManager(BaseUserManager):
         username,
         email,
         full_name,
-        mobile_no,
         password=None
     ):
 
@@ -26,9 +25,6 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError("Email is required")
         
-        if not mobile_no:
-            raise ValueError("Mobile number is required")
-
 
         email = self.normalize_email(email)
 
@@ -40,9 +36,7 @@ class UserManager(BaseUserManager):
             email=email,
 
             full_name=full_name,
-
-            mobile_no=mobile_no
-
+            
         )
 
 
@@ -64,7 +58,6 @@ class UserManager(BaseUserManager):
         username,
         email,
         full_name,
-        mobile_no,
         password=None
     ):
 
@@ -76,8 +69,6 @@ class UserManager(BaseUserManager):
             email,
 
             full_name,
-
-            mobile_no,
 
             password
 
@@ -147,7 +138,11 @@ class User(AbstractBaseUser,PermissionsMixin):
 
         max_length=15,
 
-        unique=True
+        unique=True,
+
+         blank=True,
+
+         null=True
 
     )
 

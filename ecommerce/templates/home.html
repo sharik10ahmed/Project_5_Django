@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 
+
 {% block title %}
-
-Home
-
+Home - PickUp
 {% endblock %}
+
 
 
 
@@ -13,34 +13,331 @@ Home
 {% block content %}
 
 
+
 <div class="container mt-5">
 
 
-    <div class="card shadow p-5 text-center">
+
+<!-- Hero -->
 
 
-        <h1>
-            Welcome to Pickup
-        </h1>
+<div class="row align-items-center">
 
 
-        <p class="lead">
-            Your online PickUp shopping platform
-        </p>
+<div class="col-md-6">
 
 
-        <a href="{% url 'register' %}" 
-        class="btn btn-primary">
+<h1 class="display-4 fw-bold">
 
-            Get Started
+Welcome to PickUp
 
-        </a>
+</h1>
 
 
-    </div>
+<h3 class="text-primary">
+
+Everything you need, delivered to your door
+
+</h3>
+
+
+
+<p class="mt-3">
+
+Discover trending products, exciting deals and a smooth
+shopping experience with PickUp.
+
+</p>
+
+
+
+<a href="{% url 'product' %}"
+
+class="btn btn-primary btn-lg">
+
+Shop Now
+
+</a>
 
 
 </div>
+
+
+
+
+
+<div class="col-md-6">
+
+
+<img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d"
+
+class="img-fluid rounded shadow">
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- Trending -->
+
+
+<h2 class="text-center mt-5 mb-4">
+
+Trending Now
+
+</h2>
+
+
+
+<div class="row">
+
+
+
+<div class="col-md-4">
+
+
+<div class="card shadow">
+
+
+<img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30"
+
+class="card-img-top">
+
+
+<div class="card-body">
+
+
+<h5>
+
+Smart Watches
+
+</h5>
+
+
+<p>
+
+Latest wearable technology.
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="col-md-4">
+
+
+<div class="card shadow">
+
+
+<img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e"
+
+class="card-img-top" height="300" width="200">
+
+
+<div class="card-body">
+
+
+<h5>
+
+Audio Products
+
+</h5>
+
+
+<p>
+
+Premium headphones and speakers.
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="col-md-4">
+
+
+<div class="card shadow">
+
+
+<img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9"
+
+class="card-img-top" height="300" width="200">
+
+
+<div class="card-body">
+
+
+<h5>
+
+Smart Devices
+
+</h5>
+
+
+<p>
+
+Latest gadgets and accessories.
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- Shopping Features -->
+
+
+<div class="card shadow mt-5 p-4">
+
+
+<h2 class="text-center">
+
+Why Shop From PickUp?
+
+</h2>
+
+
+
+<div class="row text-center mt-4">
+
+
+
+<div class="col-md-4">
+
+
+<h3>
+🚚
+</h3>
+
+<h5>
+Fast Delivery
+</h5>
+
+
+<p>
+Get products delivered quickly.
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="col-md-4">
+
+
+<h3>
+💰
+</h3>
+
+
+<h5>
+Best Deals
+</h5>
+
+
+<p>
+Affordable prices and offers.
+</p>
+
+
+</div>
+
+
+
+
+
+
+<div class="col-md-4">
+
+
+<h3>
+🛍️
+</h3>
+
+
+<h5>
+Wide Collection
+</h5>
+
+
+<p>
+Many categories in one place.
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+</div>
+
 
 
 

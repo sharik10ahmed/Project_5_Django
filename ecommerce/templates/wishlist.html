@@ -9,14 +9,9 @@ Wishlist - PickUp
 
 {% block content %}
 
+{% include 'page_header.html' with page_title='My Wishlist' page_description='Your favorite items saved for later' %}
 
 <div class="container mt-5">
-
-
-<h2>
-My Wishlist ❤️
-</h2>
-
 
 <div class="card shadow p-4 mt-3">
 
@@ -27,7 +22,7 @@ No products added to wishlist yet.
 
 
 <a href="{% url 'product' %}"
-class="btn btn-primary">
+class="btn" style="background-color: #FF6600; color: white; font-weight: 600;">
 
 Explore Products
 

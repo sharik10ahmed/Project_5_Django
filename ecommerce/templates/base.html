@@ -23,7 +23,7 @@
 
     <!-- Navbar -->
 
-    <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+    <nav class="navbar navbar-expand-lg" style="background-color: #f8f9fa; border-bottom: 3px solid #FF6600;">
 
 
         <div class="container">
@@ -31,9 +31,9 @@
 
             <!-- Brand -->
 
-            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
-
-                PickUp
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}" style="color: #001a4d !important;">
+                {% load static %}
+                <img src="{% static 'Assets/LOGO.png' %}" alt="PickUp Logo" style="height: 60px; object-fit: contain; margin-right: 10px;">
 
             </a>
 
@@ -72,7 +72,7 @@
 
                     <li class="nav-item">
 
-                        <a class="nav-link active" href="{% url 'home' %}">
+                        <a class="nav-link active" href="{% url 'home' %}" style="color: #001a4d !important;">
 
                             Home
 
@@ -87,7 +87,7 @@
                     <li class="nav-item">
 
 
-                        <a class="nav-link" href="{% url 'product' %}">
+                        <a class="nav-link" href="{% url 'product' %}" style="color: #001a4d !important;">
                             Product
                         </a>
 
@@ -103,7 +103,7 @@
                     <li class="nav-item">
 
 
-                        <a class="nav-link" href="{% url 'category' %}">
+                        <a class="nav-link" href="{% url 'category' %}" style="color: #001a4d !important;">
                             Category
                         </a>
 
@@ -118,7 +118,7 @@
                     <li class="nav-item">
 
 
-                        <a class="nav-link" href="{% url 'gallery' %}">
+                        <a class="nav-link" href="{% url 'gallery' %}" style="color: #001a4d !important;">
                             Gallery
                         </a>
 
@@ -133,7 +133,7 @@
                     <li class="nav-item">
 
 
-                        <a class="nav-link" href="{% url 'about' %}">
+                        <a class="nav-link" href="{% url 'about' %}" style="color: #001a4d !important;">
                             About Us
                         </a>
 
@@ -167,7 +167,7 @@
                     <li class="nav-item">
 
 
-                        <a class="nav-link fs-5" href="{% url 'wishlist' %}">
+                        <a class="nav-link fs-5" href="{% url 'wishlist' %}" style="color: #001a4d !important;">
                             ❤️
                         </a>
 
@@ -186,7 +186,7 @@
                     <li class="nav-item">
 
 
-                        <a class="nav-link fs-5" href="{% url 'cart' %}">
+                        <a class="nav-link fs-5" href="{% url 'cart' %}" style="color: #001a4d !important;">
                             🛒
                         </a>
 
@@ -210,7 +210,7 @@
                     <li class="nav-item dropdown">
 
 
-                        <a class="nav-link dropdown-toggle fs-5" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle fs-5" href="#" role="button" data-bs-toggle="dropdown" style="color: #001a4d !important;">
 
 
                             👤
@@ -221,7 +221,7 @@
 
 
 
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end" style="background-color: #f8f9fa; border: 1px solid #FF6600;">
 
 
 
@@ -230,7 +230,7 @@
                             <li>
 
 
-                                <a class="dropdown-item" href="{% url 'profile' %}">
+                                <a class="dropdown-item" href="{% url 'profile' %}" style="color: #001a4d;">
                                     My Profile
                                 </a>
 
@@ -244,7 +244,7 @@
                             <li>
 
 
-                                <a class="dropdown-item" href="{% url 'orders' %}">
+                                <a class="dropdown-item" href="{% url 'orders' %}" style="color: #001a4d;">
                                     My Orders
                                 </a>
 
@@ -270,7 +270,7 @@
                             <li>
 
 
-                                <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                                <a class="dropdown-item" href="{% url 'logout' %}" style="color: #FF6600;">
 
 
                                     Logout
@@ -297,7 +297,7 @@
                     <li class="nav-item">
 
 
-                        <a class="nav-link" href="{% url 'register' %}">
+                        <a class="nav-link" href="{% url 'register' %}" style="color: #001a4d !important;">
 
 
                             Register
@@ -318,7 +318,7 @@
                     <li class="nav-item">
 
 
-                        <a class="nav-link" href="{% url 'login' %}">
+                        <a class="nav-link" href="{% url 'login' %}" style="color: #001a4d !important;">
 
 
                             Login
@@ -385,7 +385,7 @@
 
   <!-- Footer -->
 
-<footer class="bg-dark mt-5 pt-5 pb-3">
+<footer class="mt-5 pt-5 pb-3" style="background-color: #f8f9fa; border-top: 3px solid #FF6600;">
 
 
 <div class="container">
@@ -399,15 +399,12 @@
 
 <div class="col-lg-3 col-md-6">
 
+<div class="mb-3">
+{% load static %}
+<img src="{% static 'Assets/LOGO.png' %}" alt="PickUp Logo" style="height: 70px; object-fit: contain;">
+</div>
 
-<h3 class="fw-bold text-white">
-
-🛒 PickUp
-
-</h3>
-
-
-<p class="mt-3 text-white fs-6">
+<p class="mt-3 text-dark fs-6">
 
 
 Your trusted online shopping destination.
@@ -428,7 +425,7 @@ Quality products, fast delivery and a smooth shopping experience.
 <div class="col-lg-3 col-md-6">
 
 
-<h5 class="fw-bold mb-4 text-white">
+<h5 class="fw-bold mb-4" style="color: #001a4d;">
 
 Policies
 
@@ -440,7 +437,7 @@ Policies
 
 <li class="mb-3">
 
-<a href="#" class="text-light text-decoration-none">
+<a href="#" class="text-dark text-decoration-none">
 
 Privacy Policy
 
@@ -452,7 +449,7 @@ Privacy Policy
 
 <li class="mb-3">
 
-<a href="#" class="text-light text-decoration-none">
+<a href="#" class="text-dark text-decoration-none">
 
 Refund Policy
 
@@ -464,7 +461,7 @@ Refund Policy
 
 <li class="mb-3">
 
-<a href="#" class="text-light text-decoration-none">
+<a href="#" class="text-dark text-decoration-none">
 
 Shipping Policy
 
@@ -477,7 +474,7 @@ Shipping Policy
 
 <li class="mb-3">
 
-<a href="#" class="text-light text-decoration-none">
+<a href="#" class="text-dark text-decoration-none">
 
 Terms & Conditions
 
@@ -502,7 +499,7 @@ Terms & Conditions
 <div class="col-lg-3 col-md-6">
 
 
-<h5 class="fw-bold mb-4 text-white">
+<h5 class="fw-bold mb-4" style="color: #001a4d;">
 
 About Us
 
@@ -510,7 +507,7 @@ About Us
 
 
 
-<p class="text-white fs-6">
+<p class="text-dark fs-6">
 
 
 PickUp brings you a wide collection of products with trusted quality, easy shopping and reliable delivery.
@@ -535,7 +532,7 @@ PickUp brings you a wide collection of products with trusted quality, easy shopp
 <div class="col-lg-3 col-md-6">
 
 
-<h5 class="fw-bold mb-4 text-white">
+<h5 class="fw-bold mb-4" style="color: #001a4d;">
 
 Find Us
 
@@ -577,8 +574,8 @@ Follow Us
 
 
 
-<a href="#" 
-class="btn btn-secondary rounded-circle">
+<a href="#"
+class="btn rounded-circle" style="background-color: #FF6600; color: white;">
 
 
 <i class="bi bi-facebook"></i>
@@ -588,8 +585,8 @@ class="btn btn-secondary rounded-circle">
 
 
 
-<a href="#" 
-class="btn btn-secondary rounded-circle">
+<a href="#"
+class="btn rounded-circle" style="background-color: #FF6600; color: white;">
 
 
 <i class="bi bi-instagram"></i>
@@ -600,8 +597,8 @@ class="btn btn-secondary rounded-circle">
 
 
 
-<a href="#" 
-class="btn btn-secondary rounded-circle">
+<a href="#"
+class="btn rounded-circle" style="background-color: #FF6600; color: white;">
 
 
 <i class="bi bi-youtube"></i>
@@ -612,8 +609,8 @@ class="btn btn-secondary rounded-circle">
 
 
 
-<a href="#" 
-class="btn btn-secondary rounded-circle">
+<a href="#"
+class="btn rounded-circle" style="background-color: #FF6600; color: white;">
 
 
 <i class="bi bi-whatsapp"></i>
@@ -635,7 +632,7 @@ class="btn btn-secondary rounded-circle">
 
 
 
-<hr class="mt-5 border-secondary">
+<hr class="mt-5" style="border-color: #FF6600; border-width: 2px;">
 
 
 
@@ -643,10 +640,10 @@ class="btn btn-secondary rounded-circle">
 
 <!-- Bottom -->
 
-<div class="text-center text-secondary">
+<div class="text-center" style="color: #001a4d;">
 
 
-<p class="mb-1">
+<p class="mb-1" style="color: #001a4d;">
 
 © 2026 PickUp. All Rights Reserved.
 
@@ -680,9 +677,8 @@ Designed & Developed by Sharik Ahmed
 <!-- Floating Buttons -->
 
 
-<a href="#" 
-class="position-fixed bottom-0 end-0 m-4 btn btn-success rounded-circle shadow"
-style="width:55px;height:55px;font-size:25px;">
+<a href="#"
+class="position-fixed bottom-0 end-0 m-4 btn rounded-circle shadow" style="background-color: #FF6600; color: white; width:55px;height:55px;font-size:25px;">
 
 
 <i class="bi bi-whatsapp"></i>
@@ -694,9 +690,8 @@ style="width:55px;height:55px;font-size:25px;">
 
 
 
-<a href="#" 
-class="position-fixed bottom-0 end-0 m-4 mt-5 btn btn-danger rounded-circle shadow"
-style="width:55px;height:55px;font-size:25px;transform:translateY(-80px);">
+<a href="#"
+class="position-fixed bottom-0 end-0 m-4 mt-5 btn rounded-circle shadow" style="background-color: #001a4d; color: white; width:55px;height:55px;font-size:25px;transform:translateY(-80px);">
 
 
 <i class="bi bi-youtube"></i>

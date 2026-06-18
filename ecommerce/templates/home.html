@@ -1,261 +1,148 @@
 {% extends 'base.html' %}
-
-
+{% load static %}
 
 {% block title %}
 Home - PickUp
 {% endblock %}
 
-
-
-
-
 {% block content %}
 
+<!-- Hero Banner Carousel -->
+<div id="heroBannerCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+  <div class="carousel-inner rounded">
+    <!-- Banner 1: Shop Smart -->
+    <div class="carousel-item active">
+      <img src="{% static 'Assets/banner1.png' %}" class="d-block w-100" alt="Shop Smart - Pick What You Love">
+    </div>
+    <!-- Banner 2: Shop More Save More -->
+    <div class="carousel-item">
+      <img src="{% static 'Assets/banner2.png' %}" class="d-block w-100" alt="Shop More Save More">
+    </div>
+    <!-- Banner 3: Great Products Better Everyday -->
+    <div class="carousel-item">
+      <img src="{% static 'Assets/banner3.png' %}" class="d-block w-100" alt="Great Products Better Everyday">
+    </div>
+  </div>
 
+  <!-- Carousel Controls -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroBannerCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroBannerCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+
+  <!-- Carousel Indicators -->
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#heroBannerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#heroBannerCarousel" data-bs-slide-to="1" class="bg-secondary" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#heroBannerCarousel" data-bs-slide-to="2" class="bg-secondary" aria-label="Slide 3"></button>
+  </div>
+</div>
 
 <div class="container mt-5">
 
-
-
-<!-- Hero -->
-
-
-<div class="row align-items-center">
-
-
-<div class="col-md-6">
-
-
-<h1 class="display-4 fw-bold">
-
-Welcome to PickUp
-
-</h1>
-
-
-<h3 class="text-primary">
-
-Everything you need, delivered to your door
-
-</h3>
-
-
-
-<p class="mt-3">
-
-Discover trending products, exciting deals and a smooth
-shopping experience with PickUp.
-
-</p>
-
-
-
-<a href="{% url 'product' %}"
-
-class="btn btn-primary btn-lg">
-
-Shop Now
-
-</a>
-
-
-</div>
-
-
-
-
-
-<div class="col-md-6">
-
-
-<img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d"
-
-class="img-fluid rounded shadow">
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-
-
 <!-- Trending -->
 
-
-<h2 class="text-center mt-5 mb-4">
-
+<h2 class="text-center mt-5 mb-4" style="color: #001a4d;">
 Trending Now
-
 </h2>
-
-
 
 <div class="row">
 
-
-
 <div class="col-md-4">
 
-
-<div class="card shadow">
-
+<div class="card shadow" style="border-top: 3px solid #FF6600;">
 
 <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30"
-
 class="card-img-top">
 
-
 <div class="card-body">
 
-
-<h5>
-
+<h5 style="color: #001a4d;">
 Smart Watches
-
 </h5>
 
-
 <p>
-
 Latest wearable technology.
-
 </p>
 
+</div>
 
 </div>
 
-
 </div>
-
-
-</div>
-
-
-
 
 
 
 
 <div class="col-md-4">
 
-
-<div class="card shadow">
-
+<div class="card shadow" style="border-top: 3px solid #FF6600;">
 
 <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e"
-
 class="card-img-top" height="300" width="200">
-
 
 <div class="card-body">
 
-
-<h5>
-
+<h5 style="color: #001a4d;">
 Audio Products
-
 </h5>
 
-
 <p>
-
 Premium headphones and speakers.
-
 </p>
 
+</div>
 
 </div>
 
-
 </div>
-
-
-</div>
-
-
-
-
-
 
 
 
 <div class="col-md-4">
 
-
-<div class="card shadow">
-
+<div class="card shadow" style="border-top: 3px solid #FF6600;">
 
 <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9"
-
 class="card-img-top" height="300" width="200">
-
 
 <div class="card-body">
 
-
-<h5>
-
+<h5 style="color: #001a4d;">
 Smart Devices
-
 </h5>
 
-
 <p>
-
 Latest gadgets and accessories.
-
 </p>
 
+</div>
+
+</div>
 
 </div>
 
 
 </div>
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-
-
 
 
 
 
 <!-- Shopping Features -->
 
+<div class="card shadow mt-5 p-4" style="border-left: 5px solid #FF6600;">
 
-<div class="card shadow mt-5 p-4">
-
-
-<h2 class="text-center">
-
+<h2 class="text-center" style="color: #001a4d;">
 Why Shop From PickUp?
-
 </h2>
-
-
 
 <div class="row text-center mt-4">
 
-
-
 <div class="col-md-4">
-
 
 <h3>
 🚚
@@ -265,80 +152,53 @@ Why Shop From PickUp?
 Fast Delivery
 </h5>
 
-
 <p>
 Get products delivered quickly.
 </p>
 
-
 </div>
 
 
-
-
-
 <div class="col-md-4">
-
 
 <h3>
 💰
 </h3>
 
-
 <h5>
 Best Deals
 </h5>
-
 
 <p>
 Affordable prices and offers.
 </p>
 
-
 </div>
-
-
-
 
 
 
 <div class="col-md-4">
 
-
 <h3>
 🛍️
 </h3>
-
 
 <h5>
 Wide Collection
 </h5>
 
-
 <p>
 Many categories in one place.
 </p>
 
+</div>
+
+</div>
 
 </div>
 
 
 
 </div>
-
-
-</div>
-
-
-
-
-
-
-
-
-</div>
-
-
-
 
 {% endblock %}

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User
+from .models import User, Category
 
 
 
@@ -145,4 +145,54 @@ class CustomUserAdmin(UserAdmin):
 
         ),
 
+    )
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+
+    model = Category
+
+    list_display = (
+        'name',
+        'slug',
+        'is_active',
+        'created_at'
+    )
+
+    list_filter = (
+        'is_active',
+        'created_at'
+    )
+
+    search_fields = (
+        'name',
+        'description'
+    )
+
+    ordering = (
+        'name',
+    )
+
+    prepopulated_fields = {
+        'slug': ('name',)
+    }
+
+    fieldsets = (
+        (
+            'Category Information',
+            {
+                'fields': (
+                    'name',
+                    'slug',
+                    'description',
+                    'image',
+                    'is_active'
+                )
+            }
+        ),
+    )
+
+    readonly_fields = (
+        'created_at',
+        'updated_at'
     )

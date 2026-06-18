@@ -1,141 +1,114 @@
 {% extends 'base.html' %}
 
 
-
 {% block title %}
-
 Login
-
 {% endblock %}
-
-
 
 
 {% block content %}
 
+{% include 'page_header.html' with page_title='Login' page_description='Sign in to your PickUp account' %}
 
-<div class="container mt-5">
-
+<div class="container mt-5 mb-5" style="min-height: 80vh; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
 
 <div class="row justify-content-center">
 
-
 <div class="col-md-5">
 
+<div class="card shadow-lg" style="border-left: 5px solid #FF6600; border-radius: 12px; overflow: hidden;">
 
-<div class="card shadow">
+<div class="card-header text-white" style="background: linear-gradient(135deg, #001a4d 0%, #0d2d5c 100%); padding: 30px;">
 
-
-<div class="card-header bg-primary text-white">
-
-
-<h4 class="text-center">
-
-Login
-
+<h4 class="text-center m-0" style="font-size: 28px; font-weight: 700;">
+Login to PickUp
 </h4>
 
+<p class="text-center mt-2 mb-0" style="font-size: 14px; opacity: 0.9;">
+Welcome back! Please login to your account
+</p>
 
 </div>
 
 
-
-
-<div class="card-body">
-
+<div class="card-body p-4">
 
 <form method="POST">
 
-
 {% csrf_token %}
 
-
-
 <div class="mb-3">
 
-
-<label class="form-label">
-
+<label class="form-label" style="color: #001a4d; font-weight: 600; font-size: 14px;">
 Username or email
-
 </label>
 
-
 <input
-
 type="text"
-
 name="login_input"
-
 class="form-control"
-
 placeholder="Enter username or email"
-
+style="border: 1px solid #ddd; border-radius: 6px; padding: 10px 12px;"
 required>
 
-
 </div>
-
-
 
 
 <div class="mb-3">
 
-
-<label class="form-label">
-
+<label class="form-label" style="color: #001a4d; font-weight: 600; font-size: 14px;">
 Password
-
 </label>
 
-
 <input
-
 type="password"
-
 name="password"
-
 class="form-control"
-
 placeholder="Enter password"
-
+style="border: 1px solid #ddd; border-radius: 6px; padding: 10px 12px;"
 required>
-
 
 </div>
 
+<style>
+.form-control:focus {
+  border-color: #FF6600 !important;
+  box-shadow: 0 0 0 0.2rem rgba(255, 102, 0, 0.25) !important;
+}
 
+.login-btn {
+  transition: all 0.3s ease;
+}
 
+.login-btn:hover {
+  background-color: #e55a00 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 102, 0, 0.3) !important;
+}
+</style>
 
-
-<button class="btn btn-primary w-100">
-
+<button class="btn w-100 mt-3 login-btn" style="background-color: #FF6600; color: white; font-weight: 600; padding: 12px; border-radius: 6px; border: none; font-size: 16px;">
 
 Login
 
-
 </button>
-
-
 
 </form>
 
-
+<div class="text-center mt-4" style="border-top: 1px solid #eee; padding-top: 20px;">
+  <p class="text-muted" style="font-size: 14px;">Don't have an account?
+    <a href="{% url 'register' %}" style="color: #FF6600; text-decoration: none; font-weight: 600;">Register here</a>
+  </p>
+</div>
 
 </div>
 
+</div>
 
 </div>
 
-
 </div>
 
-
 </div>
-
-
-</div>
-
-
 
 {% endblock %}

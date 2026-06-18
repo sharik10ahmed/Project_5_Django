@@ -1,0 +1,29 @@
+{% load static %}
+
+<!-- Page Header Banner -->
+<div class="py-5 text-center text-white" style="background: linear-gradient(135deg, #001a4d 0%, #003d7a 100%); position: relative; overflow: hidden;">
+  <!-- Background Pattern -->
+  <div class="position-absolute top-0 start-0 opacity-10" style="width: 150px; height: 150px; border: 3px solid white; border-radius: 50%; top: 30px; left: 30px;"></div>
+  <div class="position-absolute top-0 end-0 opacity-10" style="width: 200px; height: 200px; border: 2px solid #FF6600; border-radius: 50%; top: -50px; right: 40px;"></div>
+
+  <div class="container position-relative">
+    <!-- Breadcrumb -->
+    <div class="mb-3">
+      <small class="text-uppercase fw-bold" style="letter-spacing: 2px; opacity: 0.9;">
+        <a href="{% url 'home' %}" class="text-warning text-decoration-none fw-bold">PickUp</a>
+        <span class="mx-2" style="opacity: 0.7;">·</span>
+        <span style="opacity: 0.9;">{{ page_title }}</span>
+      </small>
+    </div>
+
+    <!-- Main Title -->
+    <h1 class="display-4 fw-bold mb-3" style="letter-spacing: -1px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+      {{ page_title }}
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="lead fs-5 mx-auto" style="max-width: 700px; opacity: 0.9; font-weight: 300;">
+      {{ page_description }}
+    </p>
+  </div>
+</div>

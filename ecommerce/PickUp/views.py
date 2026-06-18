@@ -8,7 +8,7 @@ import random
 
 from django.core.mail import send_mail
 
-from .models import User
+from .models import User, Category
 
 
 
@@ -311,8 +311,13 @@ def product(request):
 
 def category(request):
 
+    categories = Category.objects.filter(is_active=True)
+
     return render(
-        request,'category.html')
+        request,
+        'category.html',
+        {'categories': categories}
+    )
 
 
 

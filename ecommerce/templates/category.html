@@ -1,416 +1,58 @@
 {% extends 'base.html' %}
 
-
+{% load static %}
 
 {% block title %}
-
 Category - PickUp
-
 {% endblock %}
-
-
-
-
-
 
 {% block content %}
 
-
+{% include 'page_header.html' with page_title='Shop By Category' page_description='Explore products from different categories at PickUp' %}
 
 <div class="container mt-5">
 
-
-
-<!-- Heading -->
-
-
-<div class="text-center mb-5">
-
-
-<h1 class="fw-bold">
-
-Shop By Category
-
-</h1>
-
-
-<p class="text-muted">
-
-Explore products from different categories at PickUp
-
-</p>
-
-
-</div>
-
-
-
-
-
-
 <div class="row">
 
+{% if categories %}
+    {% for category in categories %}
+    <div class="col-md-3 mb-4">
+        <div class="card shadow h-100" style="border-top: 3px solid #FF6600;">
 
+            {% if category.image %}
+                <img src="{{ category.image.url }}" class="card-img-top" height="220" alt="{{ category.name }}">
+            {% else %}
+                <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853" class="card-img-top" height="220" alt="{{ category.name }}">
+            {% endif %}
 
+            <div class="card-body text-center">
+                <h5 style="color: #001a4d;">
+                    {{ category.name }}
+                </h5>
 
+                <p>
+                    {{ category.description|truncatewords:15 }}
+                </p>
 
-<!-- Electronics -->
+                <a href="{% url 'product' %}" class="btn" style="background-color: #FF6600; color: white; font-weight: 600;">
+                    Explore
+                </a>
+            </div>
 
-
-<div class="col-md-3 mb-4">
-
-
-<div class="card shadow h-100">
-
-
-<img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853"
-
-class="card-img-top"
-
-height="220">
-
-
-
-<div class="card-body text-center">
-
-
-<h5>
-
-Electronics
-
-</h5>
-
-
-<p>
-
-Mobiles, laptops, headphones and smart gadgets.
-
-</p>
-
-
-
-<a href="{% url 'product' %}"
-
-class="btn btn-primary">
-
-
-Explore
-
-
-</a>
-
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="col-12">
+        <div class="alert alert-info text-center">
+            <h5>No categories available yet</h5>
+            <p>Please check back soon!</p>
+        </div>
+    </div>
+{% endif %}
 
 </div>
 
-
 </div>
-
-
-</div>
-
-
-
-
-
-
-
-<!-- Fashion -->
-
-
-<div class="col-md-3 mb-4">
-
-
-<div class="card shadow h-100">
-
-
-<img src="https://images.unsplash.com/photo-1445205170230-053b83016050"
-
-class="card-img-top"
-
-height="220">
-
-
-
-<div class="card-body text-center">
-
-
-<h5>
-
-Fashion
-
-</h5>
-
-
-<p>
-
-Latest clothes, shoes and accessories.
-
-</p>
-
-
-
-<a href="{% url 'product' %}"
-
-class="btn btn-primary">
-
-
-Explore
-
-
-</a>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<!-- Home -->
-
-
-<div class="col-md-3 mb-4">
-
-
-<div class="card shadow h-100">
-
-
-<img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6"
-
-class="card-img-top"
-
-height="220">
-
-
-
-<div class="card-body text-center">
-
-
-<h5>
-
-Home & Living
-
-</h5>
-
-
-<p>
-
-Furniture, kitchen and home products.
-
-</p>
-
-
-
-<a href="{% url 'product' %}"
-
-class="btn btn-primary">
-
-
-Explore
-
-
-</a>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<!-- Beauty -->
-
-
-<div class="col-md-3 mb-4">
-
-
-<div class="card shadow h-100">
-
-
-<img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348"
-
-class="card-img-top"
-
-height="220">
-
-
-
-<div class="card-body text-center">
-
-
-<h5>
-
-Beauty
-
-</h5>
-
-
-<p>
-
-Beauty products and personal care items.
-
-</p>
-
-
-
-<a href="{% url 'product' %}"
-
-class="btn btn-primary">
-
-
-Explore
-
-
-</a>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-<!-- Extra Categories -->
-
-
-<div class="row mt-4">
-
-
-
-
-
-
-<div class="col-md-4 mb-4">
-
-
-<div class="card shadow text-center p-4">
-
-
-<h4>
-
-Sports
-
-</h4>
-
-
-<p>
-
-Sports equipment and fitness products.
-
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-<div class="col-md-4 mb-4">
-
-
-<div class="card shadow text-center p-4">
-
-
-<h4>
-
-Grocery
-
-</h4>
-
-
-<p>
-
-Daily essentials delivered quickly.
-
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-<div class="col-md-4 mb-4">
-
-
-<div class="card shadow text-center p-4">
-
-
-<h4>
-
-Accessories
-
-</h4>
-
-
-<p>
-
-Bags, watches and lifestyle products.
-
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-
-
-
-</div>
-
-
-
 
 {% endblock %}

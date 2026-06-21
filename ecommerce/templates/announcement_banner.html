@@ -1,52 +1,160 @@
 {% if announcements %}
-<div class="announcement-banner" style="background-color: #001a4d; color: white; padding: 12px 0; overflow: hidden; cursor: pointer;">
+<div class="announcement-banner">
     <style>
-        .announcement-scroll {
-            display: flex;
-            animation: scroll 12s linear infinite;
-            white-space: nowrap;
-            will-change: transform;
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+        .announcement-banner {
+            background-color: #001a4d;
+            color: white;
+            padding: 10px 0;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
         }
 
-        .announcement-banner:hover .announcement-scroll {
+        .announcement-scroll-container {
+            display: flex;
+            animation: scrollLeft 10s linear infinite;
+            gap: 0;
+            align-items: center;
+        }
+
+        .announcement-scroll-container:hover {
             animation-play-state: paused;
         }
 
         .announcement-item {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 0 50px;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 60px;
             font-size: 0.95em;
             font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            white-space: nowrap;
             flex-shrink: 0;
+            min-width: max-content;
         }
 
-        @keyframes scroll {
+        .announcement-item i {
+            font-size: 1.2em;
+            color: white;
+        }
+
+        .separator {
+            color: rgba(255, 255, 255, 0.4);
+            margin: 0 15px;
+            font-size: 1.2em;
+        }
+
+        @keyframes scrollLeft {
             0% {
                 transform: translateX(0);
             }
             100% {
-                transform: translateX(calc(-100% / 2));
+                transform: translateX(-50%);
             }
         }
 
-        .announcement-item i {
-            font-size: 1.1em;
-            color: #FF6600;
+        /* For reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .announcement-scroll-container {
+                animation: none;
+            }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .announcement-banner {
+                padding: 8px 0;
+            }
+
+            .announcement-item {
+                padding: 0 30px;
+                font-size: 0.85em;
+                gap: 8px;
+            }
+
+            .announcement-item i {
+                font-size: 1em;
+            }
+
+            .separator {
+                margin: 0 10px;
+            }
         }
     </style>
 
-    <div class="announcement-scroll">
-        {% for i in "0123456789AB" %}
-            {% for announcement in announcements %}
-                <div class="announcement-item">
-                    {% if announcement.icon %}
-                        <i class="{{ announcement.icon }}"></i>
-                    {% endif %}
-                    <span>{{ announcement.heading }}</span>
-                </div>
-            {% endfor %}
+    <div class="announcement-scroll-container">
+        <!-- First set of announcements -->
+        {% for announcement in announcements %}
+            <div class="announcement-item">
+                {% if announcement.icon %}
+                    <i class="{{ announcement.icon }}"></i>
+                {% else %}
+                    <i class="bi bi-airplane"></i>
+                {% endif %}
+                <span>{{ announcement.heading }}</span>
+            </div>
+            <span class="separator">•</span>
+        {% endfor %}
+
+        <!-- Duplicate set for seamless loop -->
+        {% for announcement in announcements %}
+            <div class="announcement-item">
+                {% if announcement.icon %}
+                    <i class="{{ announcement.icon }}"></i>
+                {% else %}
+                    <i class="bi bi-airplane"></i>
+                {% endif %}
+                <span>{{ announcement.heading }}</span>
+            </div>
+            <span class="separator">•</span>
+        {% endfor %}
+        {% for announcement in announcements %}
+            <div class="announcement-item">
+                {% if announcement.icon %}
+                    <i class="{{ announcement.icon }}"></i>
+                {% else %}
+                    <i class="bi bi-airplane"></i>
+                {% endif %}
+                <span>{{ announcement.heading }}</span>
+            </div>
+            <span class="separator">•</span>
+        {% endfor %}
+        {% for announcement in announcements %}
+            <div class="announcement-item">
+                {% if announcement.icon %}
+                    <i class="{{ announcement.icon }}"></i>
+                {% else %}
+                    <i class="bi bi-airplane"></i>
+                {% endif %}
+                <span>{{ announcement.heading }}</span>
+            </div>
+            <span class="separator">•</span>
+        {% endfor %}
+        {% for announcement in announcements %}
+            <div class="announcement-item">
+                {% if announcement.icon %}
+                    <i class="{{ announcement.icon }}"></i>
+                {% else %}
+                    <i class="bi bi-airplane"></i>
+                {% endif %}
+                <span>{{ announcement.heading }}</span>
+            </div>
+            <span class="separator">•</span>
+        {% endfor %}
+        {% for announcement in announcements %}
+            <div class="announcement-item">
+                {% if announcement.icon %}
+                    <i class="{{ announcement.icon }}"></i>
+                {% else %}
+                    <i class="bi bi-airplane"></i>
+                {% endif %}
+                <span>{{ announcement.heading }}</span>
+            </div>
+            <span class="separator">•</span>
         {% endfor %}
     </div>
 </div>

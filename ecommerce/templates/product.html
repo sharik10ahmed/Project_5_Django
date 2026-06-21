@@ -22,7 +22,7 @@ Products - PickUp
                     <div class="card shadow h-100" style="border-top: 3px solid #FF6600;">
 
                         {% if product.image %}
-                            <img src="{{ product.image.url }}" class="card-img-top" style="height: 250px; object-fit: cover; alt="{{ product.name }}">
+                            <img src="{{ product.image.url }}" class="card-img-top" style="height: 250px; object-fit: cover;" alt="{{ product.name }}">
                         {% else %}
                             <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
                                 <p class="text-muted">No Image Available</p>

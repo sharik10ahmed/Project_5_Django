@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Edit Profile - PickUp
+{% endblock %}
+
+{% block content %}
+
+{% include 'page_header.html' with page_title='Edit Profile' page_description='Update your account information' %}
+
+<div class="container mt-5">
+
+    <div class="card shadow p-5">
+
+        <h2 style="color: #001a4d; margin-bottom: 30px;">
+            <i class="bi bi-pencil-square"></i> Edit Profile
+        </h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Profile Image Section -->
+            <div class="row mb-4">
+                <div class="col-md-3 text-center">
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="Profile" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; margin: 0 auto;">
+                            <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-9">
+                    <div class="mb-3">
+                        <label for="id_profile_image" class="form-label fw-bold">Profile Picture</label>
+                        {{ form.profile_image }}
+                        <small class="text-muted d-block mt-2">Upload a WebP, JPG, PNG or GIF file. Max size: 5MB. WebP is recommended for better quality & smaller file size.</small>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Personal Information -->
+            <div class="mb-3">
+                <label for="id_full_name" class="form-label fw-bold">Full Name <span style="color: red;">*</span></label>
+                {{ form.full_name }}
+            </div>
+
+            <div class="mb-3">
+                <label for="id_email" class="form-label fw-bold">Email Address <span style="color: red;">*</span></label>
+                {{ form.email }}
+            </div>
+
+            <!-- Contact Information -->
+            <h5 style="color: #001a4d; margin-top: 30px; margin-bottom: 20px;">
+                <i class="bi bi-telephone"></i> Contact Information
+            </h5>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_mobile_no" class="form-label fw-bold">Mobile Number <span style="color: red;">*</span></label>
+                    {{ form.mobile_no }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_alternate_mobile_no" class="form-label fw-bold">Alternate Mobile Number</label>
+                    {{ form.alternate_mobile_no }}
+                </div>
+            </div>
+
+            <!-- Personal Details -->
+            <h5 style="color: #001a4d; margin-top: 30px; margin-bottom: 20px;">
+                <i class="bi bi-info-circle"></i> Personal Details
+            </h5>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_dob" class="form-label fw-bold">Date of Birth</label>
+                    {{ form.dob }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_gender" class="form-label fw-bold">Gender</label>
+                    {{ form.gender }}
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div class="mb-3">
+                <label for="id_address" class="form-label fw-bold">Address</label>
+                {{ form.address }}
+            </div>
+
+            <!-- Form Errors -->
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- Buttons -->
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-lg" style="background-color: #FF6600; color: white; font-weight: 600;">
+                    <i class="bi bi-check-circle"></i> Save Changes
+                </button>
+                <a href="{% url 'profile' %}" class="btn btn-lg btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

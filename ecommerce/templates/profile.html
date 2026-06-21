@@ -1,12 +1,8 @@
 {% extends 'base.html' %}
 
-
 {% block title %}
 My Profile - PickUp
 {% endblock %}
-
-
-
 
 {% block content %}
 
@@ -14,38 +10,174 @@ My Profile - PickUp
 
 <div class="container mt-5">
 
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
 
-<div class="card shadow p-5">
+            <!-- Profile Card -->
+            <div class="card shadow p-5">
 
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 style="color: #001a4d;">
+                        <i class="bi bi-person-circle"></i> My Profile
+                    </h2>
+                    <a href="{% url 'edit_profile' %}" class="btn btn-lg" style="background-color: #FF6600; color: white; font-weight: 600;">
+                        <i class="bi bi-pencil-square"></i> Edit Profile
+                    </a>
+                </div>
 
-<h2>
-My Profile
-</h2>
+                <!-- Profile Image -->
+                {% if user.profile_image %}
+                    <div class="text-center mb-4">
+                        <img src="{{ user.profile_image.url }}" alt="Profile" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                    </div>
+                {% endif %}
 
+                <hr>
 
+                <!-- Basic Information -->
+                <h5 style="color: #001a4d; margin-bottom: 20px;">
+                    <i class="bi bi-info-circle"></i> Basic Information
+                </h5>
 
-<h5>
-Username:
-{{user.username}}
-</h5>
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="info-group">
+                            <span class="fw-bold" style="color: #001a4d;">Username:</span>
+                            <p>{{ user.username }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="info-group">
+                            <span class="fw-bold" style="color: #001a4d;">Full Name:</span>
+                            <p>{{ user.full_name }}</p>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="info-group">
+                            <span class="fw-bold" style="color: #001a4d;">Email:</span>
+                            <p>{{ user.email }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="info-group">
+                            <span class="fw-bold" style="color: #001a4d;">Account Status:</span>
+                            <p>
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-<h5>
-Name:
-{{user.full_name}}
-</h5>
+                <hr>
 
+                <!-- Contact Information -->
+                <h5 style="color: #001a4d; margin-bottom: 20px;">
+                    <i class="bi bi-telephone"></i> Contact Information
+                </h5>
 
-<h5>
-Email:
-{{user.email}}
-</h5>
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="info-group">
+                            <span class="fw-bold" style="color: #001a4d;">Mobile Number:</span>
+                            <p>{{ user.mobile_no|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="info-group">
+                            <span class="fw-bold" style="color: #001a4d;">Alternate Mobile:</span>
+                            <p>{{ user.alternate_mobile_no|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                </div>
 
+                <hr>
+
+                <!-- Personal Details -->
+                <h5 style="color: #001a4d; margin-bottom: 20px;">
+                    <i class="bi bi-card-text"></i> Personal Details
+                </h5>
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="info-group">
+                            <span class="fw-bold" style="color: #001a4d;">Date of Birth:</span>
+                            <p>{{ user.dob|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="info-group">
+                            <span class="fw-bold" style="color: #001a4d;">Gender:</span>
+                            <p>{{ user.gender|default:"Not specified" }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="mb-4">
+                    <div class="info-group">
+                        <span class="fw-bold" style="color: #001a4d;">Address:</span>
+                        <p style="white-space: pre-wrap;">{{ user.address|default:"Not provided" }}</p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Account Details -->
+                <h5 style="color: #001a4d; margin-bottom: 20px;">
+                    <i class="bi bi-clock-history"></i> Account Details
+                </h5>
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="info-group">
+                            <span class="fw-bold" style="color: #001a4d;">Member Since:</span>
+                            <p>{{ user.created_at|date:"d M Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="info-group">
+                            <span class="fw-bold" style="color: #001a4d;">Last Updated:</span>
+                            <p>{{ user.updated_at|date:"d M Y, H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 mt-4">
+                    <a href="{% url 'home' %}" class="btn btn-lg btn-outline-secondary">
+                        <i class="bi bi-house"></i> Back to Home
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
 
 </div>
 
+<style>
+    .info-group {
+        background-color: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        border-left: 4px solid #FF6600;
+    }
 
-</div>
-
+    .info-group p {
+        margin-bottom: 0;
+        color: #495057;
+        font-size: 0.95rem;
+    }
+</style>
 
 {% endblock %}

@@ -10,6 +10,10 @@ from django.core.mail import send_mail
 
 from .models import User, Category, Product
 
+from .forms import UserProfileForm
+
+from django.contrib.auth.decorators import login_required
+
 
 
 
@@ -358,6 +362,28 @@ def cart(request):
 def profile(request):
 
     return render(request,'profile.html')
+
+
+@login_required(login_url='login')
+def edit_profile(request):
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('profile')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+            return redirect('edit_profile')
+
+    else:
+        form = UserProfileForm(instance=request.user)
+
+    return render(request, 'edit_profile.html', {'form': form})
 
 
 

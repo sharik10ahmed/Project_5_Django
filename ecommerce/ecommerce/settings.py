@@ -124,6 +124,14 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR/ 'media'
 
+# File Upload Configuration
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+FILE_UPLOAD_ALLOWED_EXTENSIONS = ('webp', 'jpg', 'jpeg', 'png', 'gif')
+
+# Supported Image Formats (WebP, JPEG, PNG, GIF)
+ALLOWED_IMAGE_FORMATS = ['webp', 'jpeg', 'jpg', 'png', 'gif']
+
 AUTH_USER_MODEL = 'PickUp.User'
 
 LOGIN_REDIRECT_URL = '/'

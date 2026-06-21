@@ -8,7 +8,7 @@ import random
 
 from django.core.mail import send_mail
 
-from .models import User, Category
+from .models import User, Category, Product
 
 
 
@@ -304,7 +304,13 @@ def logout_view(request):
 
 def product(request):
 
-    return render(request,'product.html')
+    products = Product.objects.filter(is_active=True)
+
+    return render(
+        request,
+        'product.html',
+        {'products': products}
+    )
 
 
 
@@ -359,6 +365,30 @@ def profile(request):
 def orders(request):
 
     return render(request,'orders.html')
+
+def privacy_policy(request):
+
+    return render(request, 'privacy_policy.html')
+
+def refund_policy(request):
+
+    return render(request, 'refund_policy.html')
+
+def shipping_policy(request):
+
+    return render(request, 'shipping_policy.html')
+
+def terms_and_conditions(request):
+
+    return render(request, 'terms_and_conditions.html')
+
+def our_mission(request):
+
+    return render(request, 'our_mission.html')
+
+def our_vision(request):
+
+    return render(request, 'our_vision.html')
 
 def verify_otp(request):
 

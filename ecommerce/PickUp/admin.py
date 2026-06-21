@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User, Category
+from .models import User, Category, Product, Announcement
 
 
 
@@ -187,6 +187,136 @@ class CategoryAdmin(admin.ModelAdmin):
                     'description',
                     'image',
                     'is_active'
+                )
+            }
+        ),
+    )
+
+    readonly_fields = (
+        'created_at',
+        'updated_at'
+    )
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+
+    model = Product
+
+    list_display = (
+        'name',
+        'category',
+        'price',
+        'discount_price',
+        'quantity',
+        'is_active',
+        'created_at'
+    )
+
+    list_filter = (
+        'is_active',
+        'category',
+        'created_at'
+    )
+
+    search_fields = (
+        'name',
+        'description'
+    )
+
+    ordering = (
+        '-created_at',
+    )
+
+    prepopulated_fields = {
+        'slug': ('name',)
+    }
+
+    fieldsets = (
+        (
+            'Product Information',
+            {
+                'fields': (
+                    'name',
+                    'slug',
+                    'category',
+                    'description',
+                    'image'
+                )
+            }
+        ),
+        (
+            'Pricing',
+            {
+                'fields': (
+                    'price',
+                    'discount_price'
+                )
+            }
+        ),
+        (
+            'Stock',
+            {
+                'fields': (
+                    'quantity',
+                )
+            }
+        ),
+        (
+            'Status',
+            {
+                'fields': (
+                    'is_active',
+                )
+            }
+        ),
+    )
+
+    readonly_fields = (
+        'created_at',
+        'updated_at'
+    )
+
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+
+    model = Announcement
+
+    list_display = (
+        'heading',
+        'is_active',
+        'created_at'
+    )
+
+    list_filter = (
+        'is_active',
+        'created_at'
+    )
+
+    search_fields = (
+        'heading',
+        'description'
+    )
+
+    ordering = (
+        '-created_at',
+    )
+
+    fieldsets = (
+        (
+            'Announcement Content',
+            {
+                'fields': (
+                    'heading',
+                    'description',
+                    'icon'
+                )
+            }
+        ),
+        (
+            'Status',
+            {
+                'fields': (
+                    'is_active',
                 )
             }
         ),

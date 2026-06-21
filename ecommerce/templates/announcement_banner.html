@@ -1,0 +1,53 @@
+{% if announcements %}
+<div class="announcement-banner" style="background-color: #001a4d; color: white; padding: 12px 0; overflow: hidden; cursor: pointer;">
+    <style>
+        .announcement-scroll {
+            display: flex;
+            animation: scroll 12s linear infinite;
+            white-space: nowrap;
+            will-change: transform;
+        }
+
+        .announcement-banner:hover .announcement-scroll {
+            animation-play-state: paused;
+        }
+
+        .announcement-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 50px;
+            font-size: 0.95em;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(calc(-100% / 2));
+            }
+        }
+
+        .announcement-item i {
+            font-size: 1.1em;
+            color: #FF6600;
+        }
+    </style>
+
+    <div class="announcement-scroll">
+        {% for i in "0123456789AB" %}
+            {% for announcement in announcements %}
+                <div class="announcement-item">
+                    {% if announcement.icon %}
+                        <i class="{{ announcement.icon }}"></i>
+                    {% endif %}
+                    <span>{{ announcement.heading }}</span>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

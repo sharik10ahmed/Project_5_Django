@@ -16,5 +16,11 @@ urlpatterns =[
     path('cart/', cart, name='cart'),
     path('profile/', profile, name='profile'),
     path('orders/', orders, name='orders'),
+    path('privacy-policy/', privacy_policy, name='privacy_policy'),
+    path('refund-policy/', refund_policy, name='refund_policy'),
+    path('shipping-policy/', shipping_policy, name='shipping_policy'),
+    path('terms-and-conditions/', terms_and_conditions, name='terms_and_conditions'),
+    path('our-mission/', our_mission, name='our_mission'),
+    path('our-vision/', our_vision, name='our_vision'),
 
 ]

@@ -57,6 +57,82 @@
         .navbar-nav .dropdown-toggle::after {
             display: none !important;
         }
+
+        /* Profile Dropdown - Premium Animations & Hover Effects */
+
+        /* Smooth fade-in and slide-up animation */
+        @keyframes dropdownSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Dropdown container styling */
+        .profile-dropdown-menu {
+            background-color: #f8f9fa;
+            border: 1px solid #FF6600;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            min-width: 200px;
+            overflow: hidden;
+            animation: dropdownSlideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Dropdown header */
+        .profile-dropdown-menu .dropdown-header {
+            background-color: #f8f9fa;
+            color: #001a4d;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        /* Dropdown item base styles */
+        .profile-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px !important;
+            color: #001a4d !important;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        /* Icon styling */
+        .profile-icon {
+            font-size: 1.1rem;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Hover effect - background and color change */
+        .profile-dropdown-item:hover {
+            background-color: #e8f0f8;
+            color: #FF6600 !important;
+        }
+
+        /* Icon bump animation on hover */
+        .profile-dropdown-item:hover .profile-icon {
+            transform: translateX(4px);
+            color: #FF6600;
+        }
+
+        /* Logout button - special styling */
+        .profile-dropdown-item.logout-item:hover {
+            background-color: #ffe8d6;
+        }
+
+        .profile-dropdown-item.logout-item:hover .profile-icon {
+            color: #FF6600;
+        }
+
+        /* Ensure dropdown menu shows animation */
+        .profile-dropdown-menu.show {
+            animation: dropdownSlideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
     </style>
 
 </head>
@@ -271,20 +347,20 @@
 
 
 
-                        <ul class="dropdown-menu dropdown-menu-end" style="background-color: #f8f9fa; border: 1px solid #FF6600;">
+                        <ul class="dropdown-menu dropdown-menu-end profile-dropdown-menu">
+                            <div class="dropdown-header px-3 py-2 border-bottom">
+                                <span class="fw-semibold" style="color: #001a4d;">{{ request.user.first_name|default:request.user.username }}</span>
+                            </div>
 
 
 
 
 
                             <li>
-
-
-                                <a class="dropdown-item" href="{% url 'profile' %}" style="color: #001a4d;">
-                                    <i class="bi bi-person-circle"></i> My Profile
+                                <a class="dropdown-item profile-dropdown-item" href="{% url 'profile' %}">
+                                    <i class="bi bi-person-circle profile-icon"></i>
+                                    <span>My Profile</span>
                                 </a>
-
-
                             </li>
 
 
@@ -292,12 +368,20 @@
 
 
                             <li>
-
-
-                                <a class="dropdown-item" href="{% url 'orders' %}" style="color: #001a4d;">
-                                    <i class="bi bi-bag-check"></i> My Orders
+                                <a class="dropdown-item profile-dropdown-item" href="{% url 'orders' %}">
+                                    <i class="bi bi-bag-check profile-icon"></i>
+                                    <span>My Orders</span>
                                 </a>
+                            </li>
 
+
+
+
+
+
+                            <li>
+
+                                <hr class="dropdown-divider my-1">
 
                             </li>
 
@@ -308,21 +392,9 @@
 
                             <li>
 
-                                <hr class="dropdown-divider">
+                                <a class="dropdown-item profile-dropdown-item logout-item" href="{% url 'logout' %}">
 
-                            </li>
-
-
-
-
-
-
-                            <li>
-
-
-                                <a class="dropdown-item" href="{% url 'logout' %}" style="color: #FF6600;">
-
-                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                    <i class="bi bi-box-arrow-right profile-icon"></i> <span>Logout</span>
 
 
                                 </a>

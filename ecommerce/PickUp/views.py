@@ -8,7 +8,7 @@ import random
 
 from django.core.mail import send_mail
 
-from .models import User, Category, Product
+from .models import User, Category, Product, Gallery, TeamMember
 
 from .forms import UserProfileForm
 
@@ -334,14 +334,22 @@ def category(request):
 
 def gallery(request):
 
-    return render(request,'gallery.html')
+    gallery_items = Gallery.objects.filter(is_active=True)
+
+    return render(
+        request,
+        'gallery.html',
+        {'gallery_items': gallery_items}
+    )
 
 
 
 
 def about(request):
 
-    return render(request,'about.html')
+    team_members = TeamMember.objects.filter(is_active=True)
+
+    return render(request, 'about.html', {'team_members': team_members})
 
 
 

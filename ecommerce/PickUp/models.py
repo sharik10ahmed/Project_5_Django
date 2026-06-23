@@ -418,3 +418,125 @@ class Announcement(models.Model):
 
     def __str__(self):
         return self.heading
+
+
+# Gallery Model
+
+class Gallery(models.Model):
+
+    title = models.CharField(
+        max_length=255
+    )
+
+    description = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    image = models.URLField(
+        blank=True,
+        null=True,
+        help_text='URL of the gallery image'
+    )
+
+    image_file = models.ImageField(
+        upload_to='gallery/',
+        blank=True,
+        null=True,
+        help_text='Upload image file alternatively'
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    order = models.IntegerField(
+        default=0,
+        help_text='Display order in gallery'
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        verbose_name_plural = "Gallery"
+        ordering = ['order', '-created_at']
+
+    def __str__(self):
+        return self.title
+
+
+# Team Member Model
+
+class TeamMember(models.Model):
+
+    name = models.CharField(
+        max_length=255
+    )
+
+    role = models.CharField(
+        max_length=255,
+        help_text='Job title or position'
+    )
+
+    bio = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Brief bio of the team member'
+    )
+
+    image = models.ImageField(
+        upload_to='team/',
+        blank=True,
+        null=True
+    )
+
+    email = models.EmailField(
+        blank=True,
+        null=True
+    )
+
+    phone = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True
+    )
+
+    linkedin = models.URLField(
+        blank=True,
+        null=True
+    )
+
+    twitter = models.URLField(
+        blank=True,
+        null=True
+    )
+
+    order = models.IntegerField(
+        default=0,
+        help_text='Display order on page'
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        verbose_name_plural = "Team Members"
+        ordering = ['order', '-created_at']
+
+    def __str__(self):
+        return self.name

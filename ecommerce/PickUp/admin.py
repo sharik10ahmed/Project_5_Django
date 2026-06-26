@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User, Category, Product, Announcement, Gallery, TeamMember, ContactMessage, ContactConfig
+from .models import User, Category, Product, Announcement, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem
 
 
 
@@ -502,3 +502,37 @@ class ContactConfigAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         # Don't allow deletion of the configuration
         return False
+
+
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 1
+
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'created_at', 'updated_at')
+    inlines = [CartItemInline]
+
+
+@admin.register(Wishlist)
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'product__name')
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ('product', 'quantity', 'price')
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'name', 'phone', 'total_price', 'status', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('name', 'phone', 'email', 'user__username')
+    inlines = [OrderItemInline]
+    readonly_fields = ('user', 'total_price', 'created_at')
+    list_editable = ('status',)

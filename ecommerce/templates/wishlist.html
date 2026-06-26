@@ -1,38 +1,92 @@
 {% extends 'base.html' %}
 
-
 {% block title %}
 Wishlist - PickUp
 {% endblock %}
-
-
 
 {% block content %}
 
 {% include 'page_header.html' with page_title='My Wishlist' page_description='Your favorite items saved for later' %}
 
-<div class="container mt-5">
-
-<div class="card shadow p-4 mt-3">
+<div class="container py-5">
 
 
-<p>
-No products added to wishlist yet.
-</p>
+    {% if wishlist_items %}
+        <div class="row g-4">
+            {% for item in wishlist_items %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow h-100 position-relative" style="border-top: 3px solid #FF6600; border-radius: 12px; overflow: hidden;">
+                        
+                        <!-- Remove from Wishlist Floating Trash Button -->
+                        <a href="{% url 'remove_from_wishlist' item.id %}" class="position-absolute top-0 end-0 m-3 d-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm" style="width: 40px; height: 40px; border: 1px solid rgba(0,0,0,0.06); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10; text-decoration: none;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 4px 10px rgba(220,53,69,0.2)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                            <i class="bi bi-trash-fill text-danger" style="font-size: 1.15rem;"></i>
+                        </a>
 
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" class="card-img-top" style="height: 250px; object-fit: cover;" alt="{{ item.product.name }}">
+                        {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <p class="text-muted">No Image Available</p>
+                            </div>
+                        {% endif %}
 
-<a href="{% url 'product' %}"
-class="btn" style="background-color: #FF6600; color: white; font-weight: 600;">
+                        <div class="card-body d-flex flex-column p-4">
+                            <h5 style="color: #001a4d; font-weight: 600;">
+                                {{ item.product.name }}
+                            </h5>
 
-Explore Products
+                            <p class="text-muted flex-grow-1" style="font-size: 0.95rem;">
+                                {{ item.product.description|truncatewords:12 }}
+                            </p>
 
-</a>
+                            <div class="mb-3">
+                                {% if item.product.discount_price %}
+                                    <span class="h6" style="color: #FF6600; font-weight: 600;">₹{{ item.product.discount_price }}</span>
+                                    <span class="text-muted" style="text-decoration: line-through; margin-left: 10px;">₹{{ item.product.price }}</span>
+                                {% else %}
+                                    <span class="h6" style="color: #001a4d; font-weight: 600;">₹{{ item.product.price }}</span>
+                                {% endif %}
+                            </div>
 
+                            <p class="text-muted small" style="margin-bottom: 15px;">
+                                {% if item.product.quantity > 0 %}
+                                    <i class="bi bi-check-circle" style="color: green;"></i> In Stock ({{ item.product.quantity }} available)
+                                {% else %}
+                                    <i class="bi bi-x-circle" style="color: red;"></i> Out of Stock
+                                {% endif %}
+                            </p>
 
+                            {% if item.product.quantity > 0 %}
+                                <a href="{% url 'add_to_cart' item.product.id %}" class="btn w-100" style="background-color: #FF6600; color: white; font-weight: 600; transition: all 0.3s ease; border-radius: 6px;" onmouseover="this.style.backgroundColor='#e55a00';" onmouseout="this.style.backgroundColor='#FF6600';">
+                                    <i class="bi bi-cart-plus me-1"></i> Add to Cart
+                                </a>
+                            {% else %}
+                                <button class="btn w-100" style="background-color: #ccc; color: #666; font-weight: 600; border-radius: 6px;" disabled>
+                                    Out of Stock
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty Wishlist -->
+        <div class="row justify-content-center py-5">
+            <div class="col-md-6 text-center">
+                <div class="card border-0 shadow-sm p-5" style="border-radius: 16px;">
+                    <div class="mb-4">
+                        <i class="bi bi-heartbreak" style="font-size: 5rem; color: #FF6600;"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3" style="color: #001a4d;">Your Wishlist is Empty</h4>
+                    <p class="text-muted mb-4">No products added to wishlist yet. Browse our selection and save your favorite items for later.</p>
+                    <a href="{% url 'product' %}" class="btn py-3 px-5 text-white" style="background-color: #FF6600; font-weight: 600; border-radius: 8px; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#e55a00';" onmouseout="this.style.backgroundColor='#FF6600';">
+                        Explore Products
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </div>
-
-
-</div>
-
 
 {% endblock %}

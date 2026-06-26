@@ -378,35 +378,27 @@
 
 
                     <!-- Wishlist -->
-
-
-                    <li class="nav-item">
-
-
-                        <a class="nav-link fs-5" href="{% url 'wishlist' %}" style="color: #001a4d !important;">
+                    <li class="nav-item me-2">
+                        <a class="nav-link fs-5 position-relative" href="{% url 'wishlist' %}" style="color: #001a4d !important; padding: 0.35rem 0.6rem;">
                             ❤️
+                            {% if wishlist_count > 0 %}
+                                <span class="position-absolute translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem; top: 15%; left: 85%;">
+                                    {{ wishlist_count }}
+                                </span>
+                            {% endif %}
                         </a>
-
                     </li>
 
-
-
-
-
-
-
-
                     <!-- Cart -->
-
-
                     <li class="nav-item">
-
-
-                        <a class="nav-link fs-5" href="{% url 'cart' %}" style="color: #001a4d !important;">
+                        <a class="nav-link fs-5 position-relative" href="{% url 'cart' %}" style="color: #001a4d !important; padding: 0.35rem 0.6rem;">
                             🛒
+                            {% if cart_count > 0 %}
+                                <span class="position-absolute translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem; top: 15%; left: 85%;">
+                                    {{ cart_count }}
+                                </span>
+                            {% endif %}
                         </a>
-
-
                     </li>
 
 

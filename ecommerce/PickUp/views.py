@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 
 from django.contrib.auth import authenticate, login, logout
 
@@ -8,7 +9,7 @@ import random
 
 from django.core.mail import send_mail
 
-from .models import User, Category, Product, Gallery, TeamMember, ContactMessage, ContactConfig
+from .models import User, Category, Product, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem
 
 from .forms import UserProfileForm
 
@@ -307,13 +308,18 @@ def logout_view(request):
     return redirect('login')
 
 def product(request):
-
     products = Product.objects.filter(is_active=True)
-
+    wishlist_product_ids = []
+    if request.user.is_authenticated:
+        wishlist_product_ids = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
+    
     return render(
         request,
         'product.html',
-        {'products': products}
+        {
+            'products': products,
+            'wishlist_product_ids': wishlist_product_ids
+        }
     )
 
 
@@ -354,15 +360,179 @@ def about(request):
 
 
 
+@login_required(login_url='login')
 def wishlist(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user).select_related('product')
+    return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
 
-    return render(request,'wishlist.html')
 
-
-
+@login_required(login_url='login')
 def cart(request):
+    cart_obj, created = Cart.objects.get_or_create(user=request.user)
+    return render(request, 'cart.html', {'cart': cart_obj})
 
-    return render(request,'cart.html')
+
+@login_required(login_url='login')
+def checkout(request):
+    cart_obj, created = Cart.objects.get_or_create(user=request.user)
+    cart_items = cart_obj.items.all()
+    if not cart_items.exists():
+        messages.error(request, "Your cart is empty. Add products before checking out.")
+        return redirect('cart')
+    
+    if request.method == 'POST':
+        # 1. Verify stock levels
+        for item in cart_items:
+            if item.quantity > item.product.quantity:
+                messages.error(request, f"Sorry, '{item.product.name}' only has {item.product.quantity} units left in stock. Please adjust your cart.")
+                return redirect('cart')
+        
+        # 2. Extract billing details
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        alternate_phone = request.POST.get('alternate_phone')
+        email = request.POST.get('email')
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        pincode = request.POST.get('pincode')
+        
+        # 3. Create Order
+        order = Order.objects.create(
+            user=request.user,
+            name=name,
+            phone=phone,
+            alternate_phone=alternate_phone,
+            email=email,
+            address=address,
+            city=city,
+            state=state,
+            pincode=pincode,
+            total_price=cart_obj.get_total_price()
+        )
+        
+        # 4. Create OrderItems & Decrement Stock
+        for item in cart_items:
+            price = item.product.discount_price if item.product.discount_price else item.product.price
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                price=price
+            )
+            # Decrement product stock
+            item.product.quantity -= item.quantity
+            item.product.save()
+            
+        # 5. Clear cart
+        cart_items.delete()
+        
+        messages.success(request, "Order Placed Successfully! Your items will be shipped soon.")
+        return redirect('orders')
+        
+    return render(request, 'checkout.html', {
+        'cart': cart_obj,
+        'cart_items': cart_items,
+    })
+
+
+def add_to_cart(request, product_id):
+    if not request.user.is_authenticated:
+        messages.error(request, "Please log in to add products to the cart.")
+        return redirect(f"{reverse('login')}?next={request.path}")
+    
+    product_obj = Product.objects.filter(id=product_id, is_active=True).first()
+    if not product_obj:
+        messages.error(request, "Product not found or inactive.")
+        return redirect('product')
+        
+    if product_obj.quantity <= 0:
+        messages.error(request, "This product is currently out of stock.")
+        return redirect(request.META.get('HTTP_REFERER', 'product'))
+        
+    cart_obj, created = Cart.objects.get_or_create(user=request.user)
+    cart_item, item_created = CartItem.objects.get_or_create(cart=cart_obj, product=product_obj)
+    
+    if not item_created:
+        if cart_item.quantity + 1 > product_obj.quantity:
+            messages.error(request, f"Cannot add more of this item. Only {product_obj.quantity} available in stock.")
+            return redirect(request.META.get('HTTP_REFERER', 'product'))
+        cart_item.quantity += 1
+        cart_item.save()
+    else:
+        if product_obj.quantity < 1:
+            messages.error(request, "This product is currently out of stock.")
+            cart_item.delete()
+            return redirect(request.META.get('HTTP_REFERER', 'product'))
+            
+    messages.success(request, f"Added '{product_obj.name}' to your cart.")
+    return redirect(request.META.get('HTTP_REFERER', 'product'))
+
+
+@login_required(login_url='login')
+def remove_from_cart(request, item_id):
+    cart_item = CartItem.objects.filter(id=item_id, cart__user=request.user).first()
+    if cart_item:
+        product_name = cart_item.product.name
+        cart_item.delete()
+        messages.success(request, f"Removed '{product_name}' from your cart.")
+    return redirect('cart')
+
+
+@login_required(login_url='login')
+def update_cart_quantity(request, item_id):
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        cart_item = CartItem.objects.filter(id=item_id, cart__user=request.user).first()
+        if cart_item:
+            product_qty = cart_item.product.quantity
+            if action == 'increase':
+                if cart_item.quantity + 1 <= product_qty:
+                    cart_item.quantity += 1
+                    cart_item.save()
+                    messages.success(request, "Quantity increased.")
+                else:
+                    messages.error(request, f"Only {product_qty} items available in stock.")
+            elif action == 'decrease':
+                if cart_item.quantity - 1 > 0:
+                    cart_item.quantity -= 1
+                    cart_item.save()
+                    messages.success(request, "Quantity decreased.")
+                else:
+                    cart_item.delete()
+                    messages.success(request, "Item removed from cart.")
+    return redirect('cart')
+
+
+def add_to_wishlist(request, product_id):
+    if not request.user.is_authenticated:
+        messages.error(request, "Please log in to add products to your wishlist.")
+        return redirect(f"{reverse('login')}?next={request.path}")
+        
+    product_obj = Product.objects.filter(id=product_id, is_active=True).first()
+    if not product_obj:
+        messages.error(request, "Product not found or inactive.")
+        return redirect('product')
+        
+    wishlist_item = Wishlist.objects.filter(user=request.user, product=product_obj).first()
+    if wishlist_item:
+        wishlist_item.delete()
+        messages.success(request, f"Removed '{product_obj.name}' from your wishlist.")
+    else:
+        Wishlist.objects.create(user=request.user, product=product_obj)
+        messages.success(request, f"Added '{product_obj.name}' to your wishlist.")
+        
+    return redirect(request.META.get('HTTP_REFERER', 'product'))
+
+
+@login_required(login_url='login')
+def remove_from_wishlist(request, wishlist_id):
+    wishlist_item = Wishlist.objects.filter(id=wishlist_id, user=request.user).first()
+    if wishlist_item:
+        product_name = wishlist_item.product.name
+        wishlist_item.delete()
+        messages.success(request, f"Removed '{product_name}' from your wishlist.")
+    return redirect('wishlist')
 
 
 
@@ -396,9 +566,32 @@ def edit_profile(request):
 
 
 
+@login_required(login_url='login')
 def orders(request):
+    user_orders = Order.objects.filter(user=request.user).prefetch_related('items__product').order_by('-created_at')
+    return render(request, 'orders.html', {'orders': user_orders})
 
-    return render(request,'orders.html')
+
+@login_required(login_url='login')
+def cancel_order(request, order_id):
+    order = Order.objects.filter(id=order_id, user=request.user).first()
+    if not order:
+        messages.error(request, "Order not found.")
+        return redirect('orders')
+        
+    if order.status == 'Pending':
+        # Restore product stock
+        for item in order.items.all():
+            item.product.quantity += item.quantity
+            item.product.save()
+            
+        order.status = 'Cancelled'
+        order.save()
+        messages.success(request, f"Order #PKU-{order.id} has been cancelled successfully.")
+    else:
+        messages.error(request, f"Order #PKU-{order.id} cannot be cancelled as its status is '{order.status}'. Only pending orders can be cancelled.")
+        
+    return redirect('orders')
 
 def privacy_policy(request):
 

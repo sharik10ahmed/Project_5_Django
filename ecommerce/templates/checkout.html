@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Checkout - PickUp
+{% endblock %}
+
+{% block content %}
+
+{% include 'page_header.html' with page_title='Checkout' page_description='Complete your billing details and place your order securely' %}
+
+<div class="container py-5">
+    <form method="POST" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <div class="row g-5">
+            
+            <!-- Left Side: Billing Information -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm p-4 p-md-5" style="border-radius: 16px; background: #ffffff;">
+                    <h3 class="fw-bold mb-4 d-flex align-items-center" style="color: #001a4d;">
+                        <i class="bi bi-geo-alt-fill text-warning me-2"></i> Billing Information
+                    </h3>
+                    
+                    <div class="row g-4">
+                        <!-- Name -->
+                        <div class="col-md-6">
+                            <label for="id_name" class="form-label fw-semibold text-muted" style="font-size: 0.9rem;">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control py-3 px-4 border-0 shadow-sm" id="id_name" name="name" 
+                                   placeholder="Your full name" value="{{ user.full_name|default:'' }}" 
+                                   style="background-color: #f8fafc; border-radius: 10px; font-weight: 500; font-size: 0.95rem; border: 1px solid rgba(0,0,0,0.05) !important;" required>
+                            <div class="invalid-feedback">Please enter your name.</div>
+                        </div>
+                        
+                        <!-- Phone -->
+                        <div class="col-md-6">
+                            <label for="id_phone" class="form-label fw-semibold text-muted" style="font-size: 0.9rem;">Phone <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control py-3 px-4 border-0 shadow-sm" id="id_phone" name="phone" 
+                                   placeholder="10-digit mobile number" value="{{ user.mobile_no|default:'' }}" 
+                                   style="background-color: #f8fafc; border-radius: 10px; font-weight: 500; font-size: 0.95rem; border: 1px solid rgba(0,0,0,0.05) !important;" required>
+                            <div class="invalid-feedback">Please enter a valid phone number.</div>
+                        </div>
+                        
+                        <!-- Alternate Phone -->
+                        <div class="col-md-6">
+                            <label for="id_alt_phone" class="form-label fw-semibold text-muted" style="font-size: 0.9rem;">Alternate phone <span class="text-muted">(optional)</span></label>
+                            <input type="tel" class="form-control py-3 px-4 border-0 shadow-sm" id="id_alt_phone" name="alternate_phone" 
+                                   placeholder="Secondary contact number" value="{{ user.alternate_mobile_no|default:'' }}" 
+                                   style="background-color: #f8fafc; border-radius: 10px; font-weight: 500; font-size: 0.95rem; border: 1px solid rgba(0,0,0,0.05) !important;">
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <label for="id_email" class="form-label fw-semibold text-muted" style="font-size: 0.9rem;">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control py-3 px-4 border-0 shadow-sm" id="id_email" name="email" 
+                                   placeholder="name@example.com" value="{{ user.email|default:'' }}" 
+                                   style="background-color: #f8fafc; border-radius: 10px; font-weight: 500; font-size: 0.95rem; border: 1px solid rgba(0,0,0,0.05) !important;" required>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                        </div>
+                        
+                        <!-- Address -->
+                        <div class="col-12">
+                            <label for="id_address" class="form-label fw-semibold text-muted" style="font-size: 0.9rem;">Address <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control py-3 px-4 border-0 shadow-sm" id="id_address" name="address" 
+                                   placeholder="Flat, House no., Building, Company, Apartment, Street address" value="{{ user.address|default:'' }}" 
+                                   style="background-color: #f8fafc; border-radius: 10px; font-weight: 500; font-size: 0.95rem; border: 1px solid rgba(0,0,0,0.05) !important;" required>
+                            <div class="invalid-feedback">Please enter your delivery address.</div>
+                        </div>
+                        
+                        <!-- City -->
+                        <div class="col-md-6">
+                            <label for="id_city" class="form-label fw-semibold text-muted" style="font-size: 0.9rem;">City <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control py-3 px-4 border-0 shadow-sm" id="id_city" name="city" 
+                                   placeholder="City name" 
+                                   style="background-color: #f8fafc; border-radius: 10px; font-weight: 500; font-size: 0.95rem; border: 1px solid rgba(0,0,0,0.05) !important;" required>
+                            <div class="invalid-feedback">Please enter your city.</div>
+                        </div>
+                        
+                        <!-- State -->
+                        <div class="col-md-6">
+                            <label for="id_state" class="form-label fw-semibold text-muted" style="font-size: 0.9rem;">State <span class="text-danger">*</span></label>
+                            <select class="form-select py-3 px-4 border-0 shadow-sm" id="id_state" name="state" 
+                                    style="background-color: #f8fafc; border-radius: 10px; font-weight: 500; font-size: 0.95rem; border: 1px solid rgba(0,0,0,0.05) !important; color: #495057;" required>
+                                <option value="" disabled selected>Select your state</option>
+                                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                <option value="Assam">Assam</option>
+                                <option value="Bihar">Bihar</option>
+                                <option value="Chhattisgarh">Chhattisgarh</option>
+                                <option value="Goa">Goa</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Haryana">Haryana</option>
+                                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                <option value="Jharkhand">Jharkhand</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Kerala">Kerala</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Maharashtra" selected>Maharashtra</option>
+                                <option value="Manipur">Manipur</option>
+                                <option value="Meghalaya">Meghalaya</option>
+                                <option value="Mizoram">Mizoram</option>
+                                <option value="Nagaland">Nagaland</option>
+                                <option value="Odisha">Odisha</option>
+                                <option value="Punjab">Punjab</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="Sikkim">Sikkim</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Telangana">Telangana</option>
+                                <option value="Tripura">Tripura</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="Uttarakhand">Uttarakhand</option>
+                                <option value="West Bengal">West Bengal</option>
+                            </select>
+                            <div class="invalid-feedback">Please select your state.</div>
+                        </div>
+                        
+                        <!-- Pincode -->
+                        <div class="col-md-6">
+                            <label for="id_pincode" class="form-label fw-semibold text-muted" style="font-size: 0.9rem;">Pincode <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control py-3 px-4 border-0 shadow-sm" id="id_pincode" name="pincode" 
+                                   placeholder="6-digit pincode" 
+                                   style="background-color: #f8fafc; border-radius: 10px; font-weight: 500; font-size: 0.95rem; border: 1px solid rgba(0,0,0,0.05) !important;" required>
+                            <div class="invalid-feedback">Please enter a valid 6-digit pincode.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side: Order Summary & Action -->
+            <div class="col-lg-4">
+                
+                <!-- Notice Banner -->
+                <div class="card border-0 mb-4 p-4 shadow-sm position-relative overflow-hidden blinking-warning" 
+                     style="border-radius: 16px; background-color: #fff5f5; border-left: 5px solid #dc3545; transition: transform 0.3s ease;">
+                    <div class="d-flex align-items-start">
+                        <div class="me-3 warning-icon-premium">
+                            <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-danger mb-1 blinking-text" style="font-size: 1rem;">IMPORTANT: 90 Rupees Additional Charge</h6>
+                            <p class="text-muted mb-0 fading-text" style="font-size: 0.85rem; line-height: 1.45;">
+                                Please ensure all details are filled correctly. Incorrect information will result in a ₹90 charge.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order Summary Card -->
+                <div class="card border-0 shadow-sm p-4" style="border-radius: 16px; background: #ffffff;">
+                    <h5 class="fw-bold mb-4" style="color: #001a4d; border-bottom: 2px solid #f8fafc; padding-bottom: 15px;">Order Summary</h5>
+                    
+                    <!-- Items List -->
+                    <div class="mb-4" style="max-height: 240px; overflow-y: auto;">
+                        {% for item in cart_items %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold text-dark" style="font-size: 0.9rem; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {{ item.product.name }}
+                                    </h6>
+                                    <small class="text-muted">Qty: {{ item.quantity }}</small>
+                                </div>
+                                <span class="fw-semibold text-muted" style="font-size: 0.9rem;">₹{{ item.get_total_item_price }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <hr class="my-3" style="border-top: 1px dashed #dee2e6;">
+                    
+                    <!-- Pricing Totals -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted" style="font-size: 0.9rem;">Subtotal</span>
+                        <span class="fw-semibold text-dark" style="font-size: 0.9rem;">₹{{ cart.get_subtotal }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted" style="font-size: 0.9rem;">Delivery Charges</span>
+                        {% if cart.get_delivery_charge > 0 %}
+                            <span class="text-danger fw-semibold" style="font-size: 0.9rem;">₹{{ cart.get_delivery_charge }}</span>
+                        {% else %}
+                            <span class="text-success fw-semibold" style="font-size: 0.9rem;">FREE</span>
+                        {% endif %}
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fw-bold fs-5" style="color: #001a4d;">Total Price</span>
+                        <span class="fw-bold fs-4" style="color: #FF6600;">₹{{ cart.get_total_price }}</span>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn w-100 py-3 d-flex align-items-center justify-content-center gap-2 text-white position-relative" 
+                            style="background-color: #001a4d; font-weight: 700; border: none; border-radius: 10px; font-size: 16px; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); overflow: hidden; z-index: 1;"
+                            onmouseover="this.style.backgroundColor='#002e80'; this.style.transform='translateY(-2px)';" 
+                            onmouseout="this.style.backgroundColor='#001a4d'; this.style.transform='translateY(0)';">
+                        <i class="bi bi-wallet2"></i> Place Order (Razorpay)
+                    </button>
+                    
+                    <a href="{% url 'cart' %}" class="btn btn-link w-100 text-center mt-3 text-decoration-none fw-semibold" style="color: #FF6600; font-size: 0.9rem;" 
+                       onmouseover="this.style.color='#e55a00';" onmouseout="this.style.color='#FF6600';">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Cart
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+    </form>
+</div>
+
+<!-- Custom Input Focus Styles -->
+<style>
+    .form-control:focus, .form-select:focus {
+        border-color: #001a4d !important;
+        box-shadow: 0 0 0 0.25rem rgba(0, 26, 77, 0.15) !important;
+        background-color: #ffffff !important;
+    }
+    @keyframes warningBlink {
+        0% {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border-left-color: #dc3545 !important;
+            background-color: #fff5f5;
+            transform: scale(1);
+        }
+        50% {
+            box-shadow: 0 8px 24px rgba(220, 53, 69, 0.25);
+            border-left-color: #ff6600 !important;
+            background-color: #ffebeb;
+            transform: scale(1.02);
+        }
+        100% {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border-left-color: #dc3545 !important;
+            background-color: #fff5f5;
+            transform: scale(1);
+        }
+    }
+    @keyframes textBlink {
+        0% {
+            color: #dc3545;
+        }
+        50% {
+            color: #ff6600;
+        }
+        100% {
+            color: #dc3545;
+        }
+    }
+    .blinking-warning {
+        animation: warningBlink 2.5s infinite ease-in-out;
+        border-left: 5px solid #dc3545 !important;
+    }
+    .blinking-text {
+        animation: textBlink 2.5s infinite ease-in-out;
+    }
+    @keyframes textFade {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+    .fading-text {
+        animation: textFade 2.5s infinite ease-in-out;
+    }
+    @keyframes iconPulse {
+        0% {
+            transform: scale(1) rotate(0deg);
+            color: #dc3545;
+            filter: drop-shadow(0 0 0px rgba(220, 53, 69, 0));
+        }
+        25% {
+            transform: scale(1.15) rotate(-6deg);
+            color: #ff3b30;
+            filter: drop-shadow(0 0 4px rgba(220, 53, 69, 0.4));
+        }
+        50% {
+            transform: scale(1.2) rotate(6deg);
+            color: #ff0000;
+            filter: drop-shadow(0 0 12px rgba(255, 0, 0, 0.8));
+        }
+        75% {
+            transform: scale(1.15) rotate(-6deg);
+            color: #ff3b30;
+            filter: drop-shadow(0 0 4px rgba(220, 53, 69, 0.4));
+        }
+        100% {
+            transform: scale(1) rotate(0deg);
+            color: #dc3545;
+            filter: drop-shadow(0 0 0px rgba(220, 53, 69, 0));
+        }
+    }
+    .warning-icon-premium {
+        animation: iconPulse 2s infinite ease-in-out;
+        display: inline-block;
+        transform-origin: center;
+    }
+</style>
+
+<!-- Bootstrap Validation Script -->
+<script>
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
+
+{% endblock %}

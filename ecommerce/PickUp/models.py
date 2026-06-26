@@ -540,3 +540,62 @@ class TeamMember(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Contact Message"
+        verbose_name_plural = "Contact Messages"
+
+    def __str__(self):
+        return f"Message from {self.name} ({self.email})"
+
+
+class ContactConfig(models.Model):
+    # Rating Info
+    platform_rating = models.DecimalField(max_digits=3, decimal_places=2, default=4.9, help_text="Rating of Platform (e.g. 4.9)")
+    max_rating = models.IntegerField(default=5, help_text="Max rating scale (e.g. 5)")
+    reviews_count = models.CharField(max_length=50, default="200+", help_text="Number of customer reviews (e.g. 200+)")
+    
+    # WhatsApp Info
+    whatsapp_number = models.CharField(max_length=20, default="+1234567890", help_text="WhatsApp phone number with country code")
+    whatsapp_text = models.CharField(max_length=255, default="Hello, I have a question about PickUp", help_text="Default message text for WhatsApp")
+
+    # Card 1 - Visit Us
+    visit_title = models.CharField(max_length=100, default="VISIT US")
+    visit_text = models.TextField(default="123 Main Street, Suite 400, New York, NY 10001")
+    visit_icon = models.CharField(max_length=50, default="bi bi-geo-alt-fill")
+
+    # Card 2 - Call Us
+    call_title = models.CharField(max_length=100, default="CALL US")
+    call_text = models.TextField(default="+1 (555) 123-4567\n+1 (555) 765-4321")
+    call_icon = models.CharField(max_length=50, default="bi bi-telephone-fill")
+
+    # Card 3 - Email Us
+    email_title = models.CharField(max_length=100, default="EMAIL US")
+    email_text = models.TextField(default="support@pickup.com\nsales@pickup.com")
+    email_icon = models.CharField(max_length=50, default="bi bi-envelope-fill")
+
+    # Card 4 - Store Hours
+    hours_title = models.CharField(max_length=100, default="STORE HOURS")
+    hours_text = models.TextField(default="Mon - Fri: 9:00 AM - 8:00 PM\nSat - Sun: 10:00 AM - 6:00 PM")
+    hours_icon = models.CharField(max_length=50, default="bi bi-clock-fill")
+
+    # Google Map Embed Code
+    map_iframe = models.TextField(
+        default='<iframe src="https://maps.google.com/maps?q=india&t=&z=5&ie=UTF8&iwloc=&output=embed" width="100%" height="150" style="border:0;" loading="lazy"></iframe>',
+        help_text="Embed iframe code for Google Maps location"
+    )
+
+    class Meta:
+        verbose_name = "Contact Page Configuration"
+        verbose_name_plural = "Contact Page Configuration"
+
+    def __str__(self):
+        return "Contact Page Config"

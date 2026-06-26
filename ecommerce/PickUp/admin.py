@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User, Category, Product, Announcement, Gallery, TeamMember
+from .models import User, Category, Product, Announcement, Gallery, TeamMember, ContactMessage, ContactConfig
 
 
 
@@ -455,3 +455,50 @@ class TeamMemberAdmin(admin.ModelAdmin):
         'created_at',
         'updated_at'
     )
+
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('name', 'email', 'message')
+    readonly_fields = ('name', 'email', 'message', 'created_at')
+
+    def has_add_permission(self, request):
+        return False  # Messages should only come from front-end submissions
+
+
+@admin.register(ContactConfig)
+class ContactConfigAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'platform_rating', 'reviews_count', 'whatsapp_number')
+    fieldsets = (
+        ('Platform Rating Info', {
+            'fields': ('platform_rating', 'max_rating', 'reviews_count')
+        }),
+        ('WhatsApp Quick Connect', {
+            'fields': ('whatsapp_number', 'whatsapp_text')
+        }),
+        ('Google Map Location', {
+            'fields': ('map_iframe',)
+        }),
+        ('Visit Us Card', {
+            'fields': ('visit_title', 'visit_icon', 'visit_text')
+        }),
+        ('Call Us Card', {
+            'fields': ('call_title', 'call_icon', 'call_text')
+        }),
+        ('Email Us Card', {
+            'fields': ('email_title', 'email_icon', 'email_text')
+        }),
+        ('Store Hours Card', {
+            'fields': ('hours_title', 'hours_icon', 'hours_text')
+        }),
+    )
+
+    def has_add_permission(self, request):
+        # Allow only one configuration row to exist
+        return not ContactConfig.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        # Don't allow deletion of the configuration
+        return False

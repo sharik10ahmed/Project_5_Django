@@ -268,7 +268,17 @@
 
 
                         <a class="nav-link" href="{% url 'about' %}" style="color: #001a4d !important;">
-                            About Us
+                            About
+                        </a>
+
+
+                    </li>
+
+                    <li class="nav-item">
+
+
+                        <a class="nav-link" href="{% url 'contact' %}" style="color: #001a4d !important;">
+                            Contact
                         </a>
 
 
@@ -488,25 +498,29 @@
 
 
     <!-- Messages -->
-
-    <div class="container mt-3">
-
+    {% block messages %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
         {% if messages %}
-
-        {% for message in messages %}
-
-        <div class="alert alert-{{message.tags}}">
-
-            {{message}}
-
-        </div>
-
-        {% endfor %}
-
+            {% for message in messages %}
+                <div class="toast align-items-center text-white {% if message.tags == 'error' or message.tags == 'danger' %}bg-danger{% elif message.tags == 'success' %}bg-success{% elif message.tags == 'warning' %}bg-warning{% else %}bg-primary{% endif %} border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+                    <div class="d-flex">
+                        <div class="toast-body d-flex align-items-center gap-2">
+                            {% if message.tags == 'success' %}
+                                <i class="bi bi-check-circle-fill"></i>
+                            {% elif message.tags == 'error' or message.tags == 'danger' %}
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle-fill"></i>
+                            {% endif %}
+                            <span>{{ message }}</span>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}
         {% endif %}
-
-
     </div>
+    {% endblock %}
 
 
 
@@ -870,6 +884,16 @@ class="position-fixed bottom-0 end-0 m-4 mt-5 btn rounded-circle shadow" style="
             } else {
                 navbar.classList.remove('scrolled');
             }
+        });
+
+        // Initialize and show all toasts
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function(toastEl) {
+                var toast = new bootstrap.Toast(toastEl);
+                toast.show();
+                return toast;
+            });
         });
     </script>
 

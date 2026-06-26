@@ -8,7 +8,7 @@ import random
 
 from django.core.mail import send_mail
 
-from .models import User, Category, Product, Gallery, TeamMember
+from .models import User, Category, Product, Gallery, TeamMember, ContactMessage, ContactConfig
 
 from .forms import UserProfileForm
 
@@ -268,7 +268,7 @@ def login_view(request):
 
                 request,
 
-                "Login successful"
+                "Login Successful"
 
             )
 
@@ -554,3 +554,76 @@ Your trusted ecommerce destination
 
 
     return render(request,'verify_otp.html')
+
+
+def contact(request):
+    # Fetch configuration or supply defaults
+    config = ContactConfig.objects.first()
+    if not config:
+        # Create a transient default config object if not in database
+        config = ContactConfig(
+            platform_rating=4.9,
+            max_rating=5,
+            reviews_count="200+",
+            whatsapp_number="+1234567890",
+            whatsapp_text="Hello, I have a question about PickUp",
+            visit_title="VISIT US",
+            visit_text="123 Main Street, Suite 400, New York, NY 10001",
+            visit_icon="bi bi-geo-alt-fill",
+            call_title="CALL US",
+            call_text="+1 (555) 123-4567\n+1 (555) 765-4321",
+            call_icon="bi bi-telephone-fill",
+            email_title="EMAIL US",
+            email_text="support@pickup.com\nsales@pickup.com",
+            email_icon="bi bi-envelope-fill",
+            hours_title="STORE HOURS",
+            hours_text="Mon - Fri: 9:00 AM - 8:00 PM\nSat - Sun: 10:00 AM - 6:00 PM",
+            hours_icon="bi bi-clock-fill",
+            map_iframe='<iframe src="https://maps.google.com/maps?q=india&t=&z=5&ie=UTF8&iwloc=&output=embed" width="100%" height="150" style="border:0;" loading="lazy"></iframe>'
+        )
+
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+
+        if not name or not email or not message:
+            messages.error(request, "All fields (Name, Email, Message) are required.")
+        else:
+            ContactMessage.objects.create(name=name, email=email, message=message)
+            messages.success(request, f"Thank you, {name}! Your message has been sent successfully.")
+            return redirect('contact')
+
+    visit_lines = [line.strip() for line in config.visit_text.split('\n') if line.strip()]
+    call_lines = [line.strip() for line in config.call_text.split('\n') if line.strip()]
+    email_lines = [line.strip() for line in config.email_text.split('\n') if line.strip()]
+    hours_lines = [line.strip() for line in config.hours_text.split('\n') if line.strip()]
+
+    # Make stars listing
+    rating_val = float(config.platform_rating)
+    full_stars = int(rating_val)
+    half_star = 1 if (rating_val - full_stars) >= 0.25 else 0
+    empty_stars = config.max_rating - full_stars - half_star
+    stars = {
+        'full': range(full_stars),
+        'half': range(half_star),
+        'empty': range(empty_stars)
+    }
+
+    # Generate WhatsApp URL
+    whatsapp_clean_num = ''.join(c for c in config.whatsapp_number if c.isdigit() or c == '+')
+    import urllib.parse
+    whatsapp_encoded_text = urllib.parse.quote(config.whatsapp_text)
+    whatsapp_url = f"https://wa.me/{whatsapp_clean_num.replace('+', '')}?text={whatsapp_encoded_text}"
+
+    context = {
+        'config': config,
+        'visit_lines': visit_lines,
+        'call_lines': call_lines,
+        'email_lines': email_lines,
+        'hours_lines': hours_lines,
+        'stars': stars,
+        'whatsapp_url': whatsapp_url,
+    }
+
+    return render(request, 'contact.html', context)

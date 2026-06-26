@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Contact Us - PickUp
+{% endblock %}
+
+{% block messages %}{% endblock %}
+
+{% block content %}
+
+{% include 'page_header.html' with page_title='Contact Us' page_description='Have questions? We would love to hear from you. Get in touch with us!' %}
+
+<style>
+    /* Premium Styling and Theme Matching for PickUp Contact Page */
+    :root {
+        --pickup-navy: #001a4d;
+        --pickup-orange: #FF6600;
+        --pickup-orange-hover: #e05a00;
+        --pickup-light: #f8f9fa;
+        --whatsapp-green: #25D366;
+        --whatsapp-green-hover: #20ba5a;
+        --shadow-subtle: 0 8px 30px rgba(0, 0, 0, 0.05);
+        --shadow-hover: 0 15px 35px rgba(255, 102, 0, 0.15);
+        --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .contact-card-info {
+        background: #ffffff;
+        border: 1px solid rgba(0, 26, 77, 0.08);
+        border-radius: 16px;
+        box-shadow: var(--shadow-subtle);
+        transition: var(--transition-smooth);
+        overflow: hidden;
+    }
+
+    .contact-card-info:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-hover);
+        border-color: var(--pickup-orange);
+    }
+
+    .contact-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: rgba(255, 102, 0, 0.1);
+        color: var(--pickup-orange);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        transition: var(--transition-smooth);
+    }
+
+    .contact-card-info:hover .contact-icon-wrapper {
+        background-color: var(--pickup-orange);
+        color: #ffffff;
+        transform: scale(1.1) rotate(10deg);
+    }
+
+    .form-container {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: var(--shadow-subtle);
+        border: 1px solid rgba(0, 26, 77, 0.05);
+    }
+
+    .form-control:focus {
+        border-color: var(--pickup-orange);
+        box-shadow: 0 0 0 0.25rem rgba(255, 102, 0, 0.25);
+    }
+
+    /* Premium Send Message Button - PickUp Theme */
+    .btn-premium-send {
+        background: linear-gradient(135deg, var(--pickup-navy) 0%, #0c2b5a 100%);
+        color: #ffffff !important;
+        border: 1.5px solid var(--pickup-orange);
+        border-radius: 10px;
+        padding: 14px 30px;
+        font-weight: 700;
+        font-size: 16px;
+        box-shadow: 0 4px 15px rgba(0, 26, 77, 0.15);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-premium-send:hover {
+        background: linear-gradient(135deg, var(--pickup-orange) 0%, var(--pickup-orange-hover) 100%);
+        border-color: var(--pickup-orange-hover);
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 10px 25px rgba(255, 102, 0, 0.3);
+    }
+
+    .btn-premium-send i {
+        transition: transform 0.3s ease;
+    }
+
+    .btn-premium-send:hover i {
+        transform: translate(5px, -5px) scale(1.15);
+    }
+
+    /* Premium WhatsApp Button */
+    .btn-premium-whatsapp {
+        background: linear-gradient(135deg, var(--whatsapp-green) 0%, #20ba5a 100%);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 10px;
+        padding: 14px 28px;
+        font-weight: 700;
+        font-size: 15px;
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-premium-whatsapp:hover {
+        background: linear-gradient(135deg, #20ba5a 0%, #1c9e4c 100%);
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+    }
+
+    .btn-premium-whatsapp i {
+        transition: transform 0.3s ease;
+    }
+
+    .btn-premium-whatsapp:hover i {
+        animation: wiggle 0.6s ease-in-out infinite;
+    }
+
+    /* Shared shine/sweep effect for premium buttons */
+    .btn-premium-send::after, .btn-premium-whatsapp::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
+        transform: skewX(-25deg);
+    }
+
+    .btn-premium-send:hover::after, .btn-premium-whatsapp:hover::after {
+        left: 150%;
+        transition: left 0.9s ease-in-out;
+    }
+
+    @keyframes wiggle {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-10deg) scale(1.15); }
+        75% { transform: rotate(10deg) scale(1.15); }
+    }
+
+    /* Map container styling */
+    .map-container {
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1.5px solid rgba(255, 102, 0, 0.2);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        height: 220px;
+    }
+
+    .map-container iframe {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 220px;
+        border: 0;
+        filter: grayscale(10%) contrast(100%);
+        transition: var(--transition-smooth);
+    }
+
+    .map-container:hover iframe {
+        filter: grayscale(0%) contrast(105%);
+    }
+
+    .rating-section {
+        background: rgba(255, 102, 0, 0.03);
+        border-left: 4px solid var(--pickup-orange);
+        border-radius: 4px 12px 12px 4px;
+    }
+
+    .star-icon {
+        color: #ffc107;
+        font-size: 1.25rem;
+    }
+</style>
+
+<div class="container py-5">
+    <!-- Message Notifications -->
+    {% if messages %}
+    <div class="row mb-4">
+        <div class="col-12">
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert">
+                <i class="bi {% if message.tags == 'error' %}bi-exclamation-triangle-fill{% else %}bi-check-circle-fill{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Intro Card matching the requested design -->
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm p-4 p-md-5 text-center" style="border-radius: 20px; background: #ffffff; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04) !important;">
+                <div class="d-flex justify-content-center mb-4">
+                    <div style="background-color: rgba(255, 102, 0, 0.08); width: 80px; height: 80px; border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(255, 102, 0, 0.25);">
+                        <!-- Styled Orange envelope icon matching PickUp theme -->
+                        <i class="bi bi-envelope-fill" style="font-size: 2.2rem; background: linear-gradient(135deg, var(--pickup-orange) 0%, #ff8533 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                    </div>
+                </div>
+                <h3 class="fw-bold mb-3" style="color: var(--pickup-navy); font-size: 28px; font-family: 'Outfit', 'Inter', sans-serif;">We'd Love to Hear From You</h3>
+                <p class="text-muted mx-auto mb-0" style="max-width: 600px; font-size: 16px; line-height: 1.6;">
+                    Reach out for product queries, order updates, or anything else. Our team typically responds within 24 hours.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 align-items-stretch">
+        <!-- Contact Form Column -->
+        <div class="col-lg-7 d-flex">
+            <div class="card border-0 shadow-sm p-4 p-md-5 w-100" style="border-radius: 20px; background: #ffffff; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04) !important;">
+                <div class="mb-3">
+                    <span style="font-size: 13px; font-weight: 700; color: #6c757d; letter-spacing: 1.5px; text-transform: uppercase;">✍ SEND A MESSAGE</span>
+                </div>
+                <h3 class="fw-bold mb-4" style="color: var(--pickup-navy); font-family: 'Outfit', 'Inter', sans-serif;">Let's start a conversation</h3>
+
+                <form method="POST" action="{% url 'contact' %}" class="needs-validation">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label mb-2" style="font-size: 12px; font-weight: 700; color: #6c757d; letter-spacing: 1px;">YOUR NAME</label>
+                            <input type="text" class="form-control px-3 py-2" id="name" name="name" placeholder="Priya Sharma" required style="background-color: #fafbfb; border: 1px solid #e1e7e5; border-radius: 8px; font-size: 15px;">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label mb-2" style="font-size: 12px; font-weight: 700; color: #6c757d; letter-spacing: 1px;">EMAIL</label>
+                            <div class="position-relative">
+                                <input type="email" class="form-control px-3 py-2 pe-5" id="email" name="email" placeholder="you@example.com" required style="background-color: #fafbfb; border: 1px solid #e1e7e5; border-radius: 8px; font-size: 15px;">
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <label for="message" class="form-label" style="font-size: 12px; font-weight: 700; color: #6c757d; letter-spacing: 1px;">MESSAGE</label>
+                            <span class="text-muted small" style="font-size: 11px;">0/500</span>
+                        </div>
+                        <textarea class="form-control px-3 py-2" id="message" name="message" rows="5" placeholder="Tell us about your inquiry, saree you're looking for, or any questions you have..." required style="background-color: #fafbfb; border: 1px solid #e1e7e5; border-radius: 8px; font-size: 15px; resize: none;"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-premium-send w-100 d-flex align-items-center justify-content-center gap-2 mb-4">
+                        <i class="bi bi-send-fill"></i> Send Message
+                    </button>
+
+                    <!-- Footer labels under button -->
+                    <div class="d-flex justify-content-center gap-4 text-muted small" style="font-size: 12px; font-weight: 500;">
+                        <span class="d-flex align-items-center gap-1">🔒 Private</span>
+                        <span class="d-flex align-items-center gap-1">⚡ Fast reply</span>
+                        <span class="d-flex align-items-center gap-1">💬 Friendly</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Maps, Ratings & Quick Connect Column -->
+        <div class="col-lg-5 d-flex flex-column justify-content-between">
+            <!-- Map Container -->
+            <div class="map-container mb-3">
+                {{ config.map_iframe|safe }}
+            </div>
+
+            <!-- Dynamic Rating Card -->
+            <div class="card border-0 shadow-sm p-4 mb-3 d-flex flex-row align-items-center gap-3" style="border-radius: 20px; background: #ffffff; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04) !important; border: 1.5px solid rgba(255, 102, 0, 0.15);">
+                <div style="background-color: rgba(255, 102, 0, 0.08); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255, 102, 0, 0.15);">
+                    <i class="bi bi-star-fill" style="color: var(--pickup-orange); font-size: 1.5rem;"></i>
+                </div>
+                <div>
+                    <div class="d-flex gap-1 text-success mb-1" style="font-size: 1.1rem; color: var(--pickup-orange) !important;">
+                        ★ ★ ★ ★ ★
+                    </div>
+                    <h6 class="fw-bold mb-1" style="color: #001a4d; font-size: 15px;">{{ config.platform_rating }} / {{ config.max_rating }} — Highly Rated</h6>
+                    <p class="text-muted small mb-0" style="font-size: 12px;">Based on {{ config.reviews_count }} customer reviews</p>
+                </div>
+            </div>
+
+            <!-- Quick Connect Card -->
+            <div class="card border-0 shadow-sm p-4 d-flex flex-column justify-content-center" style="border-radius: 20px; background: #ffffff; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04) !important; border: 1.5px solid #eef3f1;">
+                <span style="font-size: 11px; font-weight: 700; color: #6c757d; letter-spacing: 1.5px; text-transform: uppercase;">QUICK CONNECT</span>
+                <p class="text-muted small mt-2 mb-3" style="font-size: 13px; line-height: 1.5;">Prefer to chat? Reach us on WhatsApp for faster, personalized responses.</p>
+                <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-premium-whatsapp w-100 d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-whatsapp fs-5"></i> Chat on WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Info Cards Grid -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4 mt-5">
+        <!-- Card 1: Visit Us -->
+        <div class="col">
+            <div class="contact-card-info p-4 h-100 d-flex flex-column align-items-start">
+                <div class="contact-icon-wrapper">
+                    <i class="{{ config.visit_icon }}"></i>
+                </div>
+                <h5 class="fw-bold text-uppercase mb-3" style="color: var(--pickup-navy);">{{ config.visit_title }}</h5>
+                <div class="mt-auto text-muted">
+                    {% for line in visit_lines %}
+                        <p class="mb-1 small">{{ line }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Call Us -->
+        <div class="col">
+            <div class="contact-card-info p-4 h-100 d-flex flex-column align-items-start">
+                <div class="contact-icon-wrapper">
+                    <i class="{{ config.call_icon }}"></i>
+                </div>
+                <h5 class="fw-bold text-uppercase mb-3" style="color: var(--pickup-navy);">{{ config.call_title }}</h5>
+                <div class="mt-auto text-muted">
+                    {% for line in call_lines %}
+                        <p class="mb-1 small">
+                            <a href="tel:{{ line }}" class="text-decoration-none text-muted hover-link">{{ line }}</a>
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Email Us -->
+        <div class="col">
+            <div class="contact-card-info p-4 h-100 d-flex flex-column align-items-start">
+                <div class="contact-icon-wrapper">
+                    <i class="{{ config.email_icon }}"></i>
+                </div>
+                <h5 class="fw-bold text-uppercase mb-3" style="color: var(--pickup-navy);">{{ config.email_title }}</h5>
+                <div class="mt-auto text-muted">
+                    {% for line in email_lines %}
+                        <p class="mb-1 small">
+                            <a href="mailto:{{ line }}" class="text-decoration-none text-muted hover-link">{{ line }}</a>
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Store Hours -->
+        <div class="col">
+            <div class="contact-card-info p-4 h-100 d-flex flex-column align-items-start">
+                <div class="contact-icon-wrapper">
+                    <i class="{{ config.hours_icon }}"></i>
+                </div>
+                <h5 class="fw-bold text-uppercase mb-3" style="color: var(--pickup-navy);">{{ config.hours_title }}</h5>
+                <div class="mt-auto text-muted">
+                    {% for line in hours_lines %}
+                        <p class="mb-1 small">{{ line }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

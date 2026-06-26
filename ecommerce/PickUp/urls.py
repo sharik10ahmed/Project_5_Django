@@ -23,5 +23,6 @@ urlpatterns =[
     path('terms-and-conditions/', terms_and_conditions, name='terms_and_conditions'),
     path('our-mission/', our_mission, name='our_mission'),
     path('our-vision/', our_vision, name='our_vision'),
+    path('contact/', contact, name='contact'),
 
 ]

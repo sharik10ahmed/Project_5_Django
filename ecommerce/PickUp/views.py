@@ -302,7 +302,7 @@ def logout_view(request):
 
     logout(request)
 
-    messages.success(request,"Logged out successfully")
+    messages.success(request,"Logged Out Successfully")
 
     return redirect('login')
 

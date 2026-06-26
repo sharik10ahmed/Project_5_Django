@@ -4,28 +4,11 @@
 Login
 {% endblock %}
 
-{% block messages %}{% endblock %}
-
 {% block content %}
 
 {% include 'page_header.html' with page_title='Login' page_description='Sign in to your PickUp account' %}
 
 <div class="container mt-5 mb-5" style="min-height: 80vh; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
-
-<!-- Message Notifications -->
-{% if messages %}
-<div class="row justify-content-center mb-4">
-    <div class="col-md-5">
-        {% for message in messages %}
-        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 8px;">
-            <i class="bi {% if message.tags == 'error' %}bi-exclamation-triangle-fill{% else %}bi-check-circle-fill{% endif %} me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
 
 <div class="row justify-content-center">
 

@@ -146,6 +146,78 @@
         .navbar-sticky.scrolled {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
+
+        /* Premium Floating Toast Notifications */
+        .premium-toast {
+            background: linear-gradient(135deg, #001a4d 0%, #0c2b5a 100%) !important;
+            color: #ffffff !important;
+            border: 1.5px solid #FF6600 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 10px 30px rgba(255, 102, 0, 0.2) !important;
+        }
+        .premium-toast-icon-success {
+            color: #FF6600 !important;
+            font-size: 1.25rem;
+        }
+        .premium-toast-icon-error {
+            color: #ff4d4d !important;
+            font-size: 1.25rem;
+        }
+        .premium-toast-icon-info {
+            color: #33b5e5 !important;
+            font-size: 1.25rem;
+        }
+
+        /* Animations for premium toasts */
+        .premium-toast {
+            animation: toastSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            position: relative;
+            overflow: hidden !important;
+        }
+
+        .premium-toast::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 30%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: skewX(-25deg);
+            animation: toastShine 1.2s ease-in-out 0.5s;
+        }
+
+        .premium-toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: #FF6600;
+            border-radius: 0 0 0 12px;
+            animation: toastProgress 4.5s linear forwards;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes toastShine {
+            to {
+                left: 150%;
+            }
+        }
+
+        @keyframes toastProgress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
     </style>
 
 </head>
@@ -502,20 +574,22 @@
     <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
         {% if messages %}
             {% for message in messages %}
-                <div class="toast align-items-center text-white {% if message.tags == 'error' or message.tags == 'danger' %}bg-danger{% elif message.tags == 'success' %}bg-success{% elif message.tags == 'warning' %}bg-warning{% else %}bg-primary{% endif %} border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+                <div class="toast align-items-center premium-toast border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4500">
                     <div class="d-flex">
-                        <div class="toast-body d-flex align-items-center gap-2">
+                        <div class="toast-body d-flex align-items-center gap-2 py-3 px-4">
                             {% if message.tags == 'success' %}
-                                <i class="bi bi-check-circle-fill"></i>
+                                <i class="bi bi-check-circle-fill premium-toast-icon-success"></i>
                             {% elif message.tags == 'error' or message.tags == 'danger' %}
-                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <i class="bi bi-exclamation-triangle-fill premium-toast-icon-error"></i>
                             {% else %}
-                                <i class="bi bi-info-circle-fill"></i>
+                                <i class="bi bi-info-circle-fill premium-toast-icon-info"></i>
                             {% endif %}
-                            <span>{{ message }}</span>
+                            <span style="font-size: 15px; font-weight: 600; letter-spacing: 0.5px;">{{ message }}</span>
                         </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white me-3 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
+                    <!-- Countdown loader bar -->
+                    <div class="premium-toast-progress"></div>
                 </div>
             {% endfor %}
         {% endif %}

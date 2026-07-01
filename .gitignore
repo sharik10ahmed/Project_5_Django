@@ -72,3 +72,9 @@ npm-debug.log
 .cache
 instance/
 site/
+
+# Django sensitive/local files
+settings.py
+settings_local.py
+local_settings.py
+

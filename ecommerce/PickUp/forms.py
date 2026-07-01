@@ -62,7 +62,7 @@ class UserProfileForm(forms.ModelForm):
 
             # Check file format
             allowed_formats = ['image/webp', 'image/jpeg', 'image/png', 'image/gif']
-            if profile_image.content_type not in allowed_formats:
+            if hasattr(profile_image, 'content_type') and profile_image.content_type not in allowed_formats:
                 raise forms.ValidationError(
                     'Only WebP, JPEG, PNG and GIF formats are supported'
                 )

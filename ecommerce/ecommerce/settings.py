@@ -153,3 +153,8 @@ EMAIL_HOST_USER = 'sharikahmed731@gmail.com'
 EMAIL_HOST_PASSWORD = 'qijn piou dnrg tovn'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Razorpay Configuration
+RAZORPAY_API_KEY = "rzp_test_T8G1UMUZmawitQ"
+RAZORPAY_API_SECRET = "IoY9gt1dhsN1Ukh4r40urkFV"
+

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Successful - PickUp</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        .header {
+            background-color: #001a4d;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 5px solid #FF6600;
+        }
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .header p {
+            color: #ffaa66;
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            color: #001a4d;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .success-message {
+            background-color: #ebffeb;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 6px;
+            color: #155724;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+        .details-box {
+            background-color: #f8fafc;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .details-title {
+            font-weight: 700;
+            color: #001a4d;
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .details-grid {
+            display: table;
+            width: 100%;
+        }
+        .details-row {
+            display: table-row;
+        }
+        .details-label, .details-value {
+            display: table-cell;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+        .details-label {
+            font-weight: 600;
+            color: #666666;
+            width: 150px;
+        }
+        .details-value {
+            color: #111111;
+        }
+        .table-title {
+            font-weight: 700;
+            color: #001a4d;
+            margin-bottom: 12px;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        th {
+            background-color: #f8fafc;
+            color: #001a4d;
+            font-weight: 700;
+        }
+        td.price, th.price {
+            text-align: right;
+        }
+        .totals-section {
+            width: 250px;
+            margin-left: auto;
+            margin-bottom: 25px;
+        }
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+        .totals-row.grand-total {
+            border-top: 1px solid #eeeeee;
+            padding-top: 10px;
+            margin-top: 5px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #FF6600;
+        }
+        .footer {
+            background-color: #f8fafc;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #888888;
+            border-top: 1px solid #eeeeee;
+        }
+        .footer a {
+            color: #FF6600;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>PickUp Store</h1>
+        <p>Payment Successful & Order Confirmed</p>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <p class="greeting">Hello {{ order.name }},</p>
+        
+        <div class="success-message">
+            Your payment was verified successfully and your order has been placed! We are preparing your shipment now. Below are your payment and receipt details.
+        </div>
+
+        <!-- Order & Payment Details -->
+        <div class="details-box">
+            <div class="details-title">Order Information</div>
+            <div class="details-grid">
+                <div class="details-row">
+                    <div class="details-label">Order ID</div>
+                    <div class="details-value">#{{ order.id }}</div>
+                </div>
+                <div class="details-row">
+                    <div class="details-label">Payment ID</div>
+                    <div class="details-value">{{ payment_id }}</div>
+                </div>
+                <div class="details-row">
+                    <div class="details-label">Order Date</div>
+                    <div class="details-value">{{ order.created_at|date:"F j, Y, g:i a" }}</div>
+                </div>
+                <div class="details-row">
+                    <div class="details-label">Delivery Address</div>
+                    <div class="details-value">
+                        {{ order.address }}<br>
+                        {{ order.city }}, {{ order.state }} - {{ order.pincode }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="table-title">Items Ordered</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th class="price">Unit Price</th>
+                    <th class="price">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td style="text-align: center;">{{ item.quantity }}</td>
+                    <td class="price">₹{{ item.price }}</td>
+                    <td class="price">₹{{ item.get_subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Totals Section -->
+        <div class="totals-section">
+            <div class="totals-row">
+                <span style="color: #666;">Subtotal:</span>
+                <span style="font-weight: 600;">₹{{ order.total_price }}</span>
+            </div>
+            <div class="totals-row grand-total">
+                <span>Total Paid:</span>
+                <span>₹{{ order.total_price }}</span>
+            </div>
+        </div>
+        
+        <p style="font-size: 14px; color: #555555; line-height: 1.5; text-align: center; margin-top: 40px;">
+            A plain-text receipt document has been attached to this email for your records.<br>
+            If you have any questions, please contact us at <a href="mailto:support@pickup.com" style="color: #FF6600;">support@pickup.com</a>.
+        </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        &copy; 2026 PickUp Store. All rights reserved.<br>
+        123 Main Street, Suite 400, New York, NY 10001
+    </div>
+</div>
+
+</body>
+</html>

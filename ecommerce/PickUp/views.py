@@ -372,14 +372,89 @@ def cart(request):
     return render(request, 'cart.html', {'cart': cart_obj})
 
 
+def send_order_success_email(order, payment_id):
+    from django.core.mail import EmailMessage
+    from django.template.loader import render_to_string
+    from django.conf import settings
+
+    subject = f"Order #{order.id} Placed Successfully - PickUp"
+    
+    try:
+        html_content = render_to_string('emails/payment_success.html', {
+            'order': order,
+            'payment_id': payment_id,
+        })
+    except Exception as e:
+        html_content = f"Thank you for your payment! Your order #{order.id} has been placed. Payment ID: {payment_id}."
+        
+    email = EmailMessage(
+        subject=subject,
+        body=html_content,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[order.email],
+    )
+    email.content_subtype = "html"
+    
+    # Generate the receipt text
+    receipt_text = f"""==================================================
+                 PAYMENT RECEIPT
+==================================================
+Order ID:        #{order.id}
+Transaction ID:  {payment_id}
+Order Date:      {order.created_at.strftime('%B %d, %Y, %I:%M %p')}
+
+Customer Details:
+-----------------
+Name:            {order.name}
+Email:           {order.email}
+Phone:           {order.phone}
+
+Shipping Address:
+-----------------
+{order.address}
+{order.city}, {order.state} - {order.pincode}
+
+Items Purchased:
+----------------
+"""
+    for item in order.items.all():
+        receipt_text += f"- {item.product.name:<30} Qty: {item.quantity:<5} Price: ₹{item.price:<8} Subtotal: ₹{item.get_subtotal()}\n"
+
+    receipt_text += f"""
+Pricing Summary:
+----------------
+Total Amount Paid: ₹{order.total_price} (INR)
+
+==================================================
+Thank you for your purchase with PickUp Store!
+==================================================
+"""
+    # Attach plain text receipt file
+    email.attach(f"receipt_order_{order.id}.txt", receipt_text, "text/plain")
+    
+    try:
+        email.send(fail_silently=False)
+    except Exception as e:
+        pass
+
+
 @login_required(login_url='login')
 def checkout(request):
+    import razorpay
+    from django.conf import settings
+
     cart_obj, created = Cart.objects.get_or_create(user=request.user)
     cart_items = cart_obj.items.all()
     if not cart_items.exists():
         messages.error(request, "Your cart is empty. Add products before checking out.")
         return redirect('cart')
     
+    total_price = cart_obj.get_total_price()
+    amount_in_paise = int(total_price * 100)
+
+    # Initialize Razorpay client
+    client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
+
     if request.method == 'POST':
         # 1. Verify stock levels
         for item in cart_items:
@@ -387,7 +462,27 @@ def checkout(request):
                 messages.error(request, f"Sorry, '{item.product.name}' only has {item.product.quantity} units left in stock. Please adjust your cart.")
                 return redirect('cart')
         
-        # 2. Extract billing details
+        # 2. Extract Razorpay response fields
+        razorpay_payment_id = request.POST.get('razorpay_payment_id')
+        razorpay_order_id = request.POST.get('razorpay_order_id')
+        razorpay_signature = request.POST.get('razorpay_signature')
+        
+        if not razorpay_payment_id or not razorpay_order_id or not razorpay_signature:
+            messages.error(request, "Payment failed or was not completed. Please try again.")
+            return redirect('checkout')
+            
+        # 3. Verify Payment Signature
+        try:
+            client.utility.verify_payment_signature({
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': razorpay_payment_id,
+                'razorpay_signature': razorpay_signature
+            })
+        except Exception as e:
+            messages.error(request, f"Payment verification failed: {str(e)}")
+            return redirect('checkout')
+
+        # 4. Extract billing details
         name = request.POST.get('name')
         phone = request.POST.get('phone')
         alternate_phone = request.POST.get('alternate_phone')
@@ -397,7 +492,7 @@ def checkout(request):
         state = request.POST.get('state')
         pincode = request.POST.get('pincode')
         
-        # 3. Create Order
+        # 5. Create Order
         order = Order.objects.create(
             user=request.user,
             name=name,
@@ -408,10 +503,10 @@ def checkout(request):
             city=city,
             state=state,
             pincode=pincode,
-            total_price=cart_obj.get_total_price()
+            total_price=total_price
         )
         
-        # 4. Create OrderItems & Decrement Stock
+        # 6. Create OrderItems & Decrement Stock
         for item in cart_items:
             price = item.product.discount_price if item.product.discount_price else item.product.price
             OrderItem.objects.create(
@@ -424,15 +519,35 @@ def checkout(request):
             item.product.quantity -= item.quantity
             item.product.save()
             
-        # 5. Clear cart
+        # 7. Clear cart
         cart_items.delete()
         
-        messages.success(request, "Order Placed Successfully! Your items will be shipped soon.")
+        # 8. Send Confirmation Email & Payment Receipt
+        send_order_success_email(order, razorpay_payment_id)
+        
+        messages.success(request, "Order Placed Successfully! Your receipt has been emailed to you.")
         return redirect('orders')
         
+    # GET Request: Initialize Razorpay order for the checkout modal popup
+    razorpay_order_id = None
+    if amount_in_paise > 0:
+        try:
+            razorpay_order = client.order.create({
+                "amount": amount_in_paise,
+                "currency": "INR",
+                "payment_capture": 1
+            })
+            razorpay_order_id = razorpay_order['id']
+        except Exception as e:
+            messages.warning(request, f"Could not initialize Razorpay: {str(e)}. Proceeding with fallback mode.")
+            razorpay_order_id = None
+
     return render(request, 'checkout.html', {
         'cart': cart_obj,
         'cart_items': cart_items,
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_key_id': settings.RAZORPAY_API_KEY,
+        'razorpay_amount': amount_in_paise,
     })
 
 
@@ -450,22 +565,33 @@ def add_to_cart(request, product_id):
         messages.error(request, "This product is currently out of stock.")
         return redirect(request.META.get('HTTP_REFERER', 'product'))
         
+    qty_to_add = 1
+    if request.method == 'POST':
+        try:
+            qty_to_add = int(request.POST.get('quantity', 1))
+            if qty_to_add < 1:
+                qty_to_add = 1
+        except ValueError:
+            qty_to_add = 1
+            
     cart_obj, created = Cart.objects.get_or_create(user=request.user)
     cart_item, item_created = CartItem.objects.get_or_create(cart=cart_obj, product=product_obj)
     
     if not item_created:
-        if cart_item.quantity + 1 > product_obj.quantity:
+        if cart_item.quantity + qty_to_add > product_obj.quantity:
             messages.error(request, f"Cannot add more of this item. Only {product_obj.quantity} available in stock.")
             return redirect(request.META.get('HTTP_REFERER', 'product'))
-        cart_item.quantity += 1
+        cart_item.quantity += qty_to_add
         cart_item.save()
     else:
-        if product_obj.quantity < 1:
-            messages.error(request, "This product is currently out of stock.")
+        if qty_to_add > product_obj.quantity:
+            messages.error(request, f"Cannot add that quantity. Only {product_obj.quantity} available in stock.")
             cart_item.delete()
             return redirect(request.META.get('HTTP_REFERER', 'product'))
+        cart_item.quantity = qty_to_add
+        cart_item.save()
             
-    messages.success(request, f"Added '{product_obj.name}' to your cart.")
+    messages.success(request, f"Added '{product_obj.name}' (Quantity: {qty_to_add}) to your cart.")
     return redirect(request.META.get('HTTP_REFERER', 'product'))
 
 
@@ -820,3 +946,80 @@ def contact(request):
     }
 
     return render(request, 'contact.html', context)
+
+
+def product_detail(request, product_id):
+    product_obj = Product.objects.filter(id=product_id, is_active=True).first()
+    if not product_obj:
+        messages.error(request, "Product not found or inactive.")
+        return redirect('product')
+        
+    in_wishlist = False
+    wishlist_product_ids = []
+    if request.user.is_authenticated:
+        in_wishlist = Wishlist.objects.filter(user=request.user, product=product_obj).exists()
+        wishlist_product_ids = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
+        
+    # Get related products (same category, excluding this one)
+    related_products = Product.objects.filter(category=product_obj.category, is_active=True).exclude(id=product_obj.id)[:4]
+    
+    # If less than 4, fill with other active products
+    related_count = related_products.count()
+    if related_count < 4:
+        fill_products = Product.objects.filter(is_active=True).exclude(id=product_obj.id).exclude(id__in=[p.id for p in related_products])[:4 - related_count]
+        related_products = list(related_products) + list(fill_products)
+        
+    return render(
+        request,
+        'product_detail.html',
+        {
+            'product': product_obj,
+            'in_wishlist': in_wishlist,
+            'wishlist_product_ids': wishlist_product_ids,
+            'related_products': related_products,
+        }
+    )
+
+
+def buy_now(request, product_id):
+    if not request.user.is_authenticated:
+        messages.error(request, "Please log in to purchase products.")
+        return redirect(f"{reverse('login')}?next={reverse('product_detail', args=[product_id])}")
+    
+    product_obj = Product.objects.filter(id=product_id, is_active=True).first()
+    if not product_obj:
+        messages.error(request, "Product not found or inactive.")
+        return redirect('product')
+        
+    if product_obj.quantity <= 0:
+        messages.error(request, "This product is currently out of stock.")
+        return redirect(request.META.get('HTTP_REFERER', 'product'))
+        
+    qty_to_add = 1
+    if request.method == 'POST':
+        try:
+            qty_to_add = int(request.POST.get('quantity', 1))
+            if qty_to_add < 1:
+                qty_to_add = 1
+        except ValueError:
+            qty_to_add = 1
+            
+    cart_obj, created = Cart.objects.get_or_create(user=request.user)
+    cart_item, item_created = CartItem.objects.get_or_create(cart=cart_obj, product=product_obj)
+    
+    if not item_created:
+        if qty_to_add > product_obj.quantity:
+            messages.error(request, f"Only {product_obj.quantity} available in stock.")
+            return redirect(request.META.get('HTTP_REFERER', 'product'))
+        cart_item.quantity = qty_to_add
+        cart_item.save()
+    else:
+        if qty_to_add > product_obj.quantity:
+            messages.error(request, f"Only {product_obj.quantity} available in stock.")
+            cart_item.delete()
+            return redirect(request.META.get('HTTP_REFERER', 'product'))
+        cart_item.quantity = qty_to_add
+        cart_item.save()
+        
+    messages.success(request, f"Proceeding to checkout with '{product_obj.name}'.")
+    return redirect('checkout')

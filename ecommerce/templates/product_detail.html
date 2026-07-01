@@ -1,0 +1,617 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{{ product.name }} - PickUp
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Premium Page Variables & Accents */
+    :root {
+        --primary-orange: #FF6600;
+        --dark-navy: #001a4d;
+        --accent-hover: #e55a00;
+        --border-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .detail-breadcrumb {
+        font-size: 0.9rem;
+        background-color: transparent;
+        padding: 0;
+        margin-bottom: 2rem;
+    }
+    
+    .detail-breadcrumb a {
+        color: #6c757d;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    
+    .detail-breadcrumb a:hover {
+        color: var(--primary-orange);
+    }
+    
+    .detail-breadcrumb .active {
+        color: var(--dark-navy);
+        font-weight: 500;
+    }
+
+    /* Product Image Frame */
+    .image-frame {
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+        transition: all 0.4s ease;
+        position: relative;
+    }
+    
+    .image-frame:hover {
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .product-detail-img {
+        width: 100%;
+        height: auto;
+        max-height: 500px;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.15, 0.85, 0.45, 1);
+    }
+
+    .image-frame:hover .product-detail-img {
+        transform: scale(1.04);
+    }
+
+    /* Wishlist Floating Button */
+    .wishlist-float-btn {
+        position: absolute;
+        top: 20px;
+        end: 20px;
+        width: 46px;
+        height: 46px;
+        background-color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        color: var(--primary-orange);
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 10;
+    }
+    
+    .wishlist-float-btn:hover {
+        transform: scale(1.15);
+        box-shadow: 0 8px 20px rgba(255, 102, 0, 0.2);
+    }
+
+    /* Selection Options */
+    .color-pill-option {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: inline-block;
+        margin-right: 10px;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 1px #ced4da;
+        transition: all 0.2s ease;
+    }
+
+    .color-pill-option.active {
+        box-shadow: 0 0 0 2px var(--primary-orange);
+        transform: scale(1.1);
+    }
+
+    .size-box-option {
+        padding: 8px 16px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--dark-navy);
+        transition: all 0.2s ease;
+        text-align: center;
+        min-width: 50px;
+    }
+
+    .size-box-option:hover {
+        border-color: var(--primary-orange);
+        color: var(--primary-orange);
+    }
+
+    .size-box-option.active {
+        background-color: var(--primary-orange);
+        border-color: var(--primary-orange);
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(255, 102, 0, 0.15);
+    }
+
+    /* Quantity Box */
+    .quantity-control-wrapper {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        overflow: hidden;
+        max-width: 140px;
+    }
+
+    .qty-btn {
+        background: transparent;
+        border: none;
+        color: var(--dark-navy);
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        transition: background-color 0.2s ease;
+    }
+
+    .qty-btn:hover {
+        background-color: #f1f3f5;
+    }
+
+    .qty-input {
+        width: 60px;
+        height: 40px;
+        border: none;
+        border-left: 1px solid #ced4da;
+        border-right: 1px solid #ced4da;
+        text-align: center;
+        font-weight: 600;
+        color: var(--dark-navy);
+    }
+
+    .qty-input:focus {
+        outline: none;
+    }
+
+    /* Premium Action Buttons */
+    .btn-action-outline {
+        border: 2px solid var(--primary-orange);
+        color: var(--primary-orange);
+        background: transparent;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: 14px 28px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-action-outline:hover {
+        background-color: var(--primary-orange);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 102, 0, 0.15);
+    }
+
+    .btn-action-solid {
+        background-color: var(--primary-orange);
+        border: 2px solid var(--primary-orange);
+        color: #fff;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: 14px 28px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-action-solid:hover {
+        background-color: var(--accent-hover);
+        border-color: var(--accent-hover);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 102, 0, 0.25);
+    }
+
+    /* Related Products Section Card Hover Styles */
+    .product-card {
+        border-radius: 16px !important;
+        overflow: hidden;
+        border: 1px solid var(--border-color) !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        cursor: pointer;
+    }
+
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+        border-color: rgba(255, 102, 0, 0.2) !important;
+    }
+
+    .product-img-container {
+        overflow: hidden;
+        position: relative;
+        background-color: #f8f9fa;
+        height: 250px;
+    }
+
+    .product-card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .product-card:hover .product-card-img {
+        transform: scale(1.06);
+    }
+
+    /* Custom Accordion Specifications styling */
+    .specs-accordion .accordion-item {
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 5px;
+    }
+
+    .specs-accordion .accordion-button {
+        color: var(--dark-navy);
+        font-weight: 600;
+        padding-left: 0;
+        padding-right: 0;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .specs-accordion .accordion-button::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23001a4d'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+
+    .specs-accordion .accordion-button:not(.collapsed) {
+        color: var(--primary-orange);
+    }
+
+    .specs-accordion .accordion-button:not(.collapsed)::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23FF6600'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+
+    .specs-accordion .accordion-body {
+        padding-left: 0;
+        padding-right: 0;
+        color: #555;
+    }
+</style>
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav class="detail-breadcrumb" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'product' %}">Products</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Main Product Section -->
+    <div class="row g-5">
+        <!-- Left Column: Product Image Frame -->
+        <div class="col-lg-6">
+            <div class="image-frame">
+                <!-- Floating Wishlist Circle -->
+                <a href="{% url 'add_to_wishlist' product.id %}" class="wishlist-float-btn">
+                    {% if in_wishlist %}
+                        <i class="bi bi-heart-fill" style="font-size: 1.3rem;"></i>
+                    {% else %}
+                        <i class="bi bi-heart" style="font-size: 1.3rem;"></i>
+                    {% endif %}
+                </a>
+
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="product-detail-img" alt="{{ product.name }}">
+                {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 450px;">
+                        <p class="text-muted fs-5">No Image Available</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column: Product Detail Pane -->
+        <div class="col-lg-6 d-flex flex-column justify-content-between">
+            <div>
+                <!-- Category Badge and Stock Status -->
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="badge py-2 px-3 text-white uppercase" style="background-color: var(--dark-navy); border-radius: 30px; font-size: 0.8rem; font-weight: 600;">
+                        {{ product.category.name }}
+                    </span>
+                    {% if product.quantity > 0 %}
+                        <span class="badge bg-success-subtle text-success py-2 px-3" style="border-radius: 30px; font-size: 0.8rem; font-weight: 600;">
+                            <i class="bi bi-check-circle-fill me-1"></i> In Stock ({{ product.quantity }} available)
+                        </span>
+                    {% else %}
+                        <span class="badge bg-danger-subtle text-danger py-2 px-3" style="border-radius: 30px; font-size: 0.8rem; font-weight: 600;">
+                            <i class="bi bi-x-circle-fill me-1"></i> Out of Stock
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Product Name -->
+                <h1 class="fw-bold mb-3" style="color: var(--dark-navy); font-size: 2.2rem;">
+                    {{ product.name }}
+                </h1>
+
+                <!-- Ratings Overlay (Premium Aesthetic) -->
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <div class="text-warning">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-half"></i>
+                    </div>
+                    <span class="small fw-semibold text-secondary">(4.5 Rating / 148 reviews)</span>
+                </div>
+
+                <!-- Pricing Section -->
+                <div class="mb-4 d-flex align-items-baseline gap-3">
+                    {% if product.discount_price %}
+                        <span class="display-6 fw-bold" style="color: var(--primary-orange);">₹{{ product.discount_price }}</span>
+                        <span class="h4 text-muted text-decoration-line-through">₹{{ product.price }}</span>
+                        
+                        <!-- Percentage Discount Math -->
+                        {% widthratio product.discount_price product.price 100 as discount_pct %}
+                        <span class="badge bg-danger text-white py-2 px-3 ms-2" style="border-radius: 30px; font-weight: 600; font-size: 0.85rem;">
+                            Save {% widthratio product.price|add:"-product.discount_price" product.price 100 %}% OFF
+                        </span>
+                    {% else %}
+                        <span class="display-6 fw-bold" style="color: var(--dark-navy);">₹{{ product.price }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Short Description -->
+                <div class="mb-4">
+                    <p class="text-muted leading-relaxed" style="font-size: 1.05rem;">
+                        {{ product.description }}
+                    </p>
+                </div>
+
+                <hr class="my-4" style="opacity: 0.1;">
+
+                <!-- Form wrapper for Cart / Buy Now actions -->
+                <form id="productPurchaseForm" method="POST" action="">
+                    {% csrf_token %}
+                    {% if product.category.name != 'Beauty' and product.category.name != 'Grocery' %}
+                    <!-- Color Selection Option -->
+                    <div class="mb-4">
+                        <label class="fw-bold text-uppercase d-block mb-3" style="color: var(--dark-navy); font-size: 0.85rem; letter-spacing: 1px;">
+                            Color Options: <span id="selectedColorName" class="text-secondary fw-semibold">Teal</span>
+                        </label>
+                        <div class="d-flex align-items-center">
+                            <span class="color-pill-option active" style="background-color: #008080;" data-color="Teal"></span>
+                            <span class="color-pill-option" style="background-color: #FF7F50;" data-color="Coral"></span>
+                            <span class="color-pill-option" style="background-color: #000080;" data-color="Navy"></span>
+                            <span class="color-pill-option" style="background-color: #2a2a2a;" data-color="Charcoal"></span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <input type="hidden" name="selected_color" id="hiddenColorInput" value="Teal">
+
+                    {% if product.category.name == 'Fashion' or product.category.name == 'Sports' %}
+                    <!-- Size Selection Option -->
+                    <div class="mb-4">
+                        <label class="fw-bold text-uppercase d-block mb-3" style="color: var(--dark-navy); font-size: 0.85rem; letter-spacing: 1px;">
+                            Select Size: <span id="selectedSizeName" class="text-secondary fw-semibold">M</span>
+                        </label>
+                        <div class="d-flex gap-2">
+                            <span class="size-box-option" data-size="S">S</span>
+                            <span class="size-box-option active" data-size="M">M</span>
+                            <span class="size-box-option" data-size="L">L</span>
+                            <span class="size-box-option" data-size="XL">XL</span>
+                            <span class="size-box-option" data-size="XXL">XXL</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <input type="hidden" name="selected_size" id="hiddenSizeInput" value="M">
+
+                    <!-- Quantity Input Option -->
+                    {% if product.quantity > 0 %}
+                    <div class="mb-4">
+                        <label class="fw-bold text-uppercase d-block mb-3" style="color: var(--dark-navy); font-size: 0.85rem; letter-spacing: 1px;">
+                            Quantity:
+                        </label>
+                        <div class="quantity-control-wrapper">
+                            <button type="button" class="qty-btn" id="qtyDecrementBtn">-</button>
+                            <input type="text" name="quantity" class="qty-input" id="detailQtyInput" value="1" readonly>
+                            <button type="button" class="qty-btn" id="qtyIncrementBtn">+</button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
+                        {% if product.quantity > 0 %}
+                            <button type="submit" formaction="{% url 'add_to_cart' product.id %}" class="btn btn-action-outline flex-grow-1">
+                                <i class="bi bi-cart-plus me-2"></i> Add to Cart
+                            </button>
+                            <button type="submit" formaction="{% url 'buy_now' product.id %}" class="btn btn-action-solid flex-grow-1">
+                                <i class="bi bi-lightning-fill me-2"></i> Buy Now
+                            </button>
+                        {% else %}
+                            <button type="button" class="btn btn-secondary w-100 py-3 fw-bold" disabled style="border-radius: 10px;">
+                                <i class="bi bi-x-circle me-2"></i> Out of Stock
+                            </button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabbed Specifications / Accordions -->
+            <div class="accordion specs-accordion mt-5" id="productSpecificationsAccordion">
+                <!-- Description tab -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingDesc">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDesc" aria-expanded="true" aria-controls="collapseDesc">
+                            Product Description
+                        </button>
+                    </h2>
+                    <div id="collapseDesc" class="accordion-collapse collapse show" aria-labelledby="headingDesc" data-bs-parent="#productSpecificationsAccordion">
+                        <div class="accordion-body">
+                            {{ product.description }}
+                        </div>
+                    </div>
+                </div>
+                <!-- Details tab -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingDetails">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
+                            Details & Specifications
+                        </button>
+                    </h2>
+                    <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails" data-bs-parent="#productSpecificationsAccordion">
+                        <div class="accordion-body">
+                            <table class="table table-borderless table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-semibold text-secondary" style="width: 140px;">Category</td>
+                                        <td class="text-dark">{{ product.category.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold text-secondary">Manufacturer</td>
+                                        <td class="text-dark">PickUp Brand Lab</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold text-secondary">Material</td>
+                                        <td class="text-dark">Eco-friendly sourced materials</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold text-secondary">Weight</td>
+                                        <td class="text-dark">150g</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold text-secondary">Shipping</td>
+                                        <td class="text-dark">Free delivery in 2-4 business days on orders above ₹500</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products Section -->
+    <div class="mt-5 pt-5 border-top" style="border-color: rgba(0, 0, 0, 0.05) !important;">
+        <h3 class="fw-bold mb-4" style="color: var(--dark-navy);">
+            Related Products
+        </h3>
+        
+        <div class="row g-4 mt-2">
+            {% for rel_prod in related_products %}
+                <div class="col-md-3 col-sm-6">
+                    <div class="card product-card h-100 bg-white shadow-sm" onclick="window.location.href='{% url 'product_detail' rel_prod.id %}'">
+                        <div class="product-img-container">
+                            <!-- Wishlist Floating Icon (Relative card) -->
+                            <a href="{% url 'add_to_wishlist' rel_prod.id %}" class="position-absolute top-0 end-0 m-3 d-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm" style="width: 36px; height: 36px; border: 1px solid rgba(0,0,0,0.06); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10; text-decoration: none;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 4px 10px rgba(255,102,0,0.2)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';" onclick="event.stopPropagation();">
+                                {% if rel_prod.id in wishlist_product_ids %}
+                                    <i class="bi bi-heart-fill" style="color: var(--primary-orange); font-size: 1rem;"></i>
+                                {% else %}
+                                    <i class="bi bi-heart" style="color: var(--primary-orange); font-size: 1rem;"></i>
+                                {% endif %}
+                            </a>
+
+                            {% if rel_prod.image %}
+                                <img src="{{ rel_prod.image.url }}" class="product-card-img" alt="{{ rel_prod.name }}">
+                            {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center h-100">
+                                    <p class="text-muted small">No Image</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body d-flex flex-column p-3">
+                            <h6 class="fw-bold mb-1 text-truncate" style="color: var(--dark-navy);">
+                                {{ rel_prod.name }}
+                            </h6>
+                            <p class="text-muted small flex-grow-1 text-truncate mb-2">
+                                {{ rel_prod.description|truncatewords:8 }}
+                            </p>
+
+                            <div class="mb-3">
+                                {% if rel_prod.discount_price %}
+                                    <span class="fw-bold text-danger me-2">₹{{ rel_prod.discount_price }}</span>
+                                    <span class="text-muted small text-decoration-line-through">₹{{ rel_prod.price }}</span>
+                                {% else %}
+                                    <span class="fw-bold" style="color: var(--dark-navy);">₹{{ rel_prod.price }}</span>
+                                {% endif %}
+                            </div>
+
+                            {% if rel_prod.quantity > 0 %}
+                                <a href="{% url 'buy_now' rel_prod.id %}" class="btn btn-sm w-100 text-white" style="background-color: var(--primary-orange); font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='var(--accent-hover)';" onmouseout="this.style.backgroundColor='var(--primary-orange)';" onclick="event.stopPropagation();">
+                                    Buy Now
+                                </a>
+                            {% else %}
+                                <button class="btn btn-sm w-100 btn-secondary fw-semibold" disabled>
+                                    Out of Stock
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // JS implementation for size/color selector selection feedback
+    document.addEventListener("DOMContentLoaded", function () {
+        // Color selector
+        const colorPills = document.querySelectorAll(".color-pill-option");
+        const hiddenColorInput = document.getElementById("hiddenColorInput");
+        const selectedColorName = document.getElementById("selectedColorName");
+
+        colorPills.forEach(pill => {
+            pill.addEventListener("click", function () {
+                colorPills.forEach(p => p.classList.remove("active"));
+                this.classList.add("active");
+                const colorValue = this.getAttribute("data-color");
+                if (hiddenColorInput) hiddenColorInput.value = colorValue;
+                if (selectedColorName) selectedColorName.textContent = colorValue;
+            });
+        });
+
+        // Size selector
+        const sizeBoxes = document.querySelectorAll(".size-box-option");
+        const hiddenSizeInput = document.getElementById("hiddenSizeInput");
+        const selectedSizeName = document.getElementById("selectedSizeName");
+
+        sizeBoxes.forEach(box => {
+            box.addEventListener("click", function () {
+                sizeBoxes.forEach(b => b.classList.remove("active"));
+                this.classList.add("active");
+                const sizeValue = this.getAttribute("data-size");
+                if (hiddenSizeInput) hiddenSizeInput.value = sizeValue;
+                if (selectedSizeName) selectedSizeName.textContent = sizeValue;
+            });
+        });
+
+        // Quantity selector
+        const qtyDecrementBtn = document.getElementById("qtyDecrementBtn");
+        const qtyIncrementBtn = document.getElementById("qtyIncrementBtn");
+        const qtyInput = document.getElementById("detailQtyInput");
+
+        if (qtyInput) {
+            const maxQuantity = parseInt("{{ product.quantity }}") || 1;
+
+            qtyDecrementBtn.addEventListener("click", function () {
+                let currentVal = parseInt(qtyInput.value) || 1;
+                if (currentVal > 1) {
+                    qtyInput.value = currentVal - 1;
+                }
+            });
+
+            qtyIncrementBtn.addEventListener("click", function () {
+                let currentVal = parseInt(qtyInput.value) || 1;
+                if (currentVal < maxQuantity) {
+                    qtyInput.value = currentVal + 1;
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

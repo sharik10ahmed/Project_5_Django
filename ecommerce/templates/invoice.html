@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice #PKU-{{ order.id }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #111827; margin: 24px; }
+        .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; }
+        .title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .muted { color: #6b7280; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 10px 8px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+        .total { text-align: right; font-size: 18px; font-weight: 700; margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="title">Invoice #PKU-{{ order.id }}</div>
+        <div class="muted">Placed on {{ order.created_at|date:"d M Y, h:i A" }}</div>
+        <div style="margin-top: 16px;">
+            <strong>Customer:</strong> {{ order.name }}<br>
+            <strong>Email:</strong> {{ order.email }}<br>
+            <strong>Phone:</strong> {{ order.phone }}
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>₹{{ item.price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>₹{{ item.get_subtotal }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="total">Total: ₹{{ order.total_price }}</div>
+    </div>
+</body>
+</html>

@@ -5,22 +5,43 @@ My Orders - PickUp
 {% endblock %}
 
 {% block content %}
-
-{% include 'page_header.html' with page_title='My Orders' page_description='Track your purchase history and delivery statuses' %}
+{% include 'page_header.html' with page_title='My Orders' page_description='Track your order history and filter by date, tracking number, or product.' %}
 
 <div class="container py-5">
-    {% if orders %}
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                <div class="card-body p-4">
+                    <form method="get" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold" for="q">Search</label>
+                            <input type="text" class="form-control" id="q" name="q" value="{{ active_filters.q }}" placeholder="Order ID or tracking">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold" for="start_date">From</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="{{ active_filters.start_date }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold" for="end_date">To</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="{{ active_filters.end_date }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold" for="product_name">Product Name</label>
+                            <input type="text" class="form-control" id="product_name" name="product_name" value="{{ active_filters.product_name }}" placeholder="e.g. Bluetooth Speaker">
+                        </div>
+                        <div class="col-md-2 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
+                            <a href="{% url 'my_orders' %}" class="btn btn-outline-secondary">Reset</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if orders %}
                 <h3 class="fw-bold mb-4" style="color: #001a4d;">Your Order History</h3>
-                
                 {% for order in orders %}
                     <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden; background: #ffffff;">
-                        
-                        <!-- Order Header Banner -->
-                        <div class="card-header border-0 p-4 d-flex flex-wrap justify-content-between align-items-center gap-3" 
-                             style="background: linear-gradient(135deg, #001a4d 0%, #002c80 100%); color: white;">
+                        <div class="card-header border-0 p-4 d-flex flex-wrap justify-content-between align-items-center gap-3" style="background: linear-gradient(135deg, #001a4d 0%, #002c80 100%); color: white;">
                             <div>
                                 <span class="text-uppercase fw-semibold tracking-wider text-warning" style="font-size: 0.8rem; letter-spacing: 1px;">Order Reference</span>
                                 <h5 class="mb-0 fw-bold">#PKU-{{ order.id }}</h5>
@@ -28,6 +49,10 @@ My Orders - PickUp
                             <div class="text-md-end">
                                 <span class="d-block text-white-50" style="font-size: 0.8rem;">Placed On</span>
                                 <span class="fw-semibold">{{ order.created_at|date:"d M Y, h:i A" }}</span>
+                            </div>
+                            <div class="text-md-end">
+                                <span class="d-block text-white-50" style="font-size: 0.8rem;">Tracking</span>
+                                <span class="fw-semibold">{{ order.tracking_number|default:'Not assigned yet' }}</span>
                             </div>
                             <div class="text-md-end">
                                 <span class="d-block text-white-50" style="font-size: 0.8rem;">Total Cost</span>
@@ -53,20 +78,9 @@ My Orders - PickUp
                                     </span>
                                 {% endif %}
                             </div>
-                            {% if order.status == 'Confirmed' %}
-                            <div>
-                                <span class="d-block text-white-50 mb-1" style="font-size: 0.8rem;">Actions</span>
-                                <a href="{% url 'cancel_order' order.id %}" class="btn btn-sm btn-outline-danger px-3 py-2 fw-bold text-white border-white" style="border-radius: 20px; transition: all 0.3s ease; font-size: 0.85rem;" onmouseover="this.style.backgroundColor='#dc3545'; this.style.borderColor='#dc3545';" onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='white';">
-                                    <i class="bi bi-x-circle me-1"></i> Cancel Order
-                                </a>
-                            </div>
-                            {% endif %}
                         </div>
-                        
-                        <!-- Order Body -->
+
                         <div class="card-body p-4 p-md-5">
-                            
-                            <!-- Items List -->
                             <h6 class="fw-bold mb-4 text-uppercase tracking-wider text-muted" style="font-size: 0.8rem; letter-spacing: 1px;">Ordered Items</h6>
                             <div class="table-responsive mb-4">
                                 <table class="table align-middle table-borderless">
@@ -104,58 +118,39 @@ My Orders - PickUp
                                     </tbody>
                                 </table>
                             </div>
-                            
-                            <!-- Delivery & Shipping Details -->
-                            <div class="row g-4 pt-3">
-                                <div class="col-md-6">
-                                    <div class="p-4 rounded-4" style="background-color: #f8fafc; border: 1px solid rgba(0,0,0,0.03);">
-                                        <h6 class="fw-bold mb-3 text-uppercase tracking-wider text-muted" style="font-size: 0.8rem; letter-spacing: 1px;">
-                                            <i class="bi bi-geo-alt-fill text-warning me-1"></i> Delivery Address
-                                        </h6>
-                                        <p class="mb-1 fw-bold text-dark">{{ order.name }}</p>
-                                        <p class="mb-2 text-muted small" style="line-height: 1.5;">{{ order.address }}, {{ order.city }}, {{ order.state }} - {{ order.pincode }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="p-4 rounded-4" style="background-color: #f8fafc; border: 1px solid rgba(0,0,0,0.03);">
-                                        <h6 class="fw-bold mb-3 text-uppercase tracking-wider text-muted" style="font-size: 0.8rem; letter-spacing: 1px;">
-                                            <i class="bi bi-telephone-fill text-warning me-1"></i> Contact Information
-                                        </h6>
-                                        <p class="mb-1 small"><strong class="text-muted">Email:</strong> {{ order.email }}</p>
-                                        <p class="mb-1 small"><strong class="text-muted">Phone:</strong> {{ order.phone }}</p>
-                                        {% if order.alternate_phone %}
-                                            <p class="mb-0 small"><strong class="text-muted">Alt Phone:</strong> {{ order.alternate_phone }}</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
+                            <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
+                                <a href="{% url 'invoice_preview' order.id %}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">Preview</a>
+                                <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                <a href="{% url 'invoice_download' order.id %}" class="btn btn-sm btn-outline-secondary">Download</a>
+                                <form method="post" action="{% url 'delete_order' order.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                </form>
+                                <form method="post" action="{% url 'order_delete' order.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger" style="background-color: #dc3545; border-color: #dc3545; color: white;">Delete</button>
+                                </form>
                             </div>
-                            
                         </div>
                     </div>
                 {% endfor %}
-                
-            </div>
-        </div>
-    {% else %}
-        <!-- Empty Order History Page -->
-        <div class="row justify-content-center py-5">
-            <div class="col-md-6 text-center">
-                <div class="card border-0 shadow-sm p-5" style="border-radius: 16px; background-color: #ffffff;">
-                    <div class="mb-4">
-                        <i class="bi bi-bag-x-fill" style="font-size: 5rem; color: #FF6600; opacity: 0.8;"></i>
+            {% else %}
+                <div class="row justify-content-center py-5">
+                    <div class="col-md-6 text-center">
+                        <div class="card border-0 shadow-sm p-5" style="border-radius: 16px; background-color: #ffffff;">
+                            <div class="mb-4">
+                                <i class="bi bi-bag-x-fill" style="font-size: 5rem; color: #FF6600; opacity: 0.8;"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3" style="color: #001a4d;">No matching orders found</h4>
+                            <p class="text-muted mb-4">Try a different search or clear the filters to see your full order history.</p>
+                            <a href="{% url 'my_orders' %}" class="btn py-3 px-5 text-white" style="background-color: #FF6600; font-weight: 600; border-radius: 8px; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#e55a00';" onmouseout="this.style.backgroundColor='#FF6600';">
+                                View All Orders
+                            </a>
+                        </div>
                     </div>
-                    <h4 class="fw-bold mb-3" style="color: #001a4d;">No Orders Placed Yet</h4>
-                    <p class="text-muted mb-4">You haven't made any purchases yet. Start exploring our premium product collections today!</p>
-                    <a href="{% url 'product' %}" class="btn py-3 px-5 text-white" 
-                       style="background-color: #FF6600; font-weight: 600; border-radius: 8px; transition: all 0.3s ease;" 
-                       onmouseover="this.style.backgroundColor='#e55a00';" 
-                       onmouseout="this.style.backgroundColor='#FF6600';">
-                        Start Shopping
-                    </a>
                 </div>
-            </div>
+            {% endif %}
         </div>
-    {% endif %}
+    </div>
 </div>
-
 {% endblock %}

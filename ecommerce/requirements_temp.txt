@@ -1,0 +1,5 @@
+Django==6.0.6
+Pillow==12.2.0
+razorpay==2.0.1
+weasyprint==69.0
+xhtml2pdf==0.2.17

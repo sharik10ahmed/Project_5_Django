@@ -1,5 +1,9 @@
+from datetime import timedelta
+
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
+
 from .models import ContactMessage, ContactConfig
 
 class ContactUsTests(TestCase):
@@ -58,7 +62,132 @@ class ContactUsTests(TestCase):
         self.assertEqual(ContactMessage.objects.count(), 0)
 
 
-from .models import Cart, CartItem, Wishlist, Product, Category, User
+from .models import Cart, CartItem, Wishlist, Product, Category, User, Order, OrderItem
+
+class MyOrdersViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='ordersuser',
+            email='ordersuser@example.com',
+            full_name='Orders User',
+            password='testpassword'
+        )
+        self.other_user = User.objects.create_user(
+            username='otherordersuser',
+            email='otherordersuser@example.com',
+            full_name='Other Orders User',
+            password='testpassword'
+        )
+
+        self.category = Category.objects.create(name='Electronics', slug='electronics')
+        self.product = Product.objects.create(
+            name='Bluetooth Speaker',
+            slug='bluetooth-speaker',
+            category=self.category,
+            price=2500.00,
+            quantity=5,
+            is_active=True
+        )
+
+        self.order_one = Order.objects.create(
+            user=self.user,
+            name='Orders User',
+            phone='9876543210',
+            email='ordersuser@example.com',
+            address='123 Main Street',
+            city='Mumbai',
+            state='Maharashtra',
+            pincode='400001',
+            total_price=2500.00,
+            tracking_number='TRK-1001',
+            created_at=timezone.now() - timedelta(days=10),
+        )
+        OrderItem.objects.create(order=self.order_one, product=self.product, quantity=1, price=2500.00)
+
+        self.order_two = Order.objects.create(
+            user=self.user,
+            name='Orders User',
+            phone='9876543210',
+            email='ordersuser@example.com',
+            address='123 Main Street',
+            city='Mumbai',
+            state='Maharashtra',
+            pincode='400001',
+            total_price=5000.00,
+            tracking_number='TRK-2002',
+            created_at=timezone.now() - timedelta(days=2),
+        )
+        OrderItem.objects.create(order=self.order_two, product=self.product, quantity=2, price=2500.00)
+
+        self.order_three = Order.objects.create(
+            user=self.other_user,
+            name='Other User',
+            phone='9876543210',
+            email='other@example.com',
+            address='123 Main Street',
+            city='Mumbai',
+            state='Maharashtra',
+            pincode='400001',
+            total_price=3000.00,
+            tracking_number='TRK-3003',
+            created_at=timezone.now() - timedelta(days=1),
+        )
+        OrderItem.objects.create(order=self.order_three, product=self.product, quantity=1, price=3000.00)
+
+    def test_my_orders_page_filters_for_current_user(self):
+        self.client.login(username='ordersuser', password='testpassword')
+
+        response = self.client.get(reverse('my_orders'), {
+            'q': '2002',
+            'start_date': (timezone.now() - timedelta(days=3)).date().isoformat(),
+            'end_date': timezone.now().date().isoformat(),
+            'product_name': 'Bluetooth',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'my_orders.html')
+        self.assertIn('orders', response.context)
+        self.assertEqual(list(response.context['orders']), [self.order_two])
+        self.assertEqual(response.context['active_filters']['q'], '2002')
+        self.assertEqual(response.context['active_filters']['start_date'], (timezone.now() - timedelta(days=3)).date().isoformat())
+        self.assertEqual(response.context['active_filters']['end_date'], timezone.now().date().isoformat())
+        self.assertEqual(response.context['active_filters']['product_name'], 'Bluetooth')
+
+    def test_order_detail_page_uses_current_user_order(self):
+        self.client.login(username='ordersuser', password='testpassword')
+        response = self.client.get(reverse('order_detail', args=[self.order_one.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'order_detail.html')
+        self.assertContains(response, '#PKU-' + str(self.order_one.id))
+
+    def test_invoice_preview_and_download_work_for_owner(self):
+        self.client.login(username='ordersuser', password='testpassword')
+
+        preview = self.client.get(reverse('invoice_preview', args=[self.order_one.id]))
+        self.assertEqual(preview.status_code, 200)
+        self.assertTemplateUsed(preview, 'invoice_template.html')
+        self.assertContains(preview, 'Order Reference')
+        self.assertContains(preview, 'Delivery Address')
+        self.assertContains(preview, self.user.full_name)
+
+        download = self.client.get(reverse('invoice_download', args=[self.order_one.id]))
+        self.assertEqual(download.status_code, 200)
+        self.assertEqual(download['Content-Type'], 'application/pdf')
+        self.assertIn('attachment; filename=', download['Content-Disposition'])
+
+    def test_delete_order_cancels_owned_order(self):
+        self.client.login(username='ordersuser', password='testpassword')
+        response = self.client.post(reverse('delete_order', args=[self.order_one.id]))
+        self.assertRedirects(response, reverse('my_orders'))
+        self.order_one.refresh_from_db()
+        self.assertEqual(self.order_one.status, 'Cancelled')
+
+    def test_order_delete_permanently_removes_owned_order(self):
+        self.client.login(username='ordersuser', password='testpassword')
+        response = self.client.post(reverse('order_delete', args=[self.order_one.id]))
+        self.assertRedirects(response, reverse('my_orders'))
+        self.assertFalse(Order.objects.filter(id=self.order_one.id).exists())
+
 
 class CartAndWishlistTests(TestCase):
     def setUp(self):
@@ -224,7 +353,7 @@ class CartAndWishlistTests(TestCase):
 
     def test_user_can_cancel_pending_order_and_restores_stock(self):
         self.client.login(username='testuser', password='testpassword')
-        # Create a pending order
+        # Create a confirmed order
         from .models import Order, OrderItem
         order = Order.objects.create(
             user=self.user,
@@ -308,9 +437,9 @@ class CartAndWishlistTests(TestCase):
         response = self.client.get(reverse('cancel_order', args=[order.id]))
         self.assertRedirects(response, reverse('orders'))
         
-        # Status should remain Pending since current user is not the owner
+        # Status should remain Confirmed since current user is not the owner
         order.refresh_from_db()
-        self.assertEqual(order.status, 'Pending')
+        self.assertEqual(order.status, 'Confirmed')
 
     def test_anonymous_user_badge_counts_in_context(self):
         response = self.client.get(reverse('product'))

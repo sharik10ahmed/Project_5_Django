@@ -699,7 +699,7 @@ class Wishlist(models.Model):
 
 class Order(models.Model):
     STATUS_CHOICES = (
-        ('Pending', 'Pending'),
+        ('Confirmed', 'Confirmed'),
         ('Shipped', 'Shipped'),
         ('Delivered', 'Delivered'),
         ('Cancelled', 'Cancelled'),
@@ -715,7 +715,8 @@ class Order(models.Model):
     state = models.CharField(max_length=100)
     pincode = models.CharField(max_length=10)
     total_price = models.DecimalField(max_digits=12, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    tracking_number = models.CharField(max_length=50, blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Confirmed')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -1,5 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.db.models import Q
+from django.views import View
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 
 from django.contrib.auth import authenticate, login, logout
 
@@ -9,11 +13,18 @@ import random
 
 from django.core.mail import send_mail
 
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 from .models import User, Category, Product, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem
+from .email_utils import send_order_success_email
 
 from .forms import UserProfileForm
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 
@@ -372,72 +383,6 @@ def cart(request):
     return render(request, 'cart.html', {'cart': cart_obj})
 
 
-def send_order_success_email(order, payment_id):
-    from django.core.mail import EmailMessage
-    from django.template.loader import render_to_string
-    from django.conf import settings
-
-    subject = f"Order #{order.id} Placed Successfully - PickUp"
-    
-    try:
-        html_content = render_to_string('emails/payment_success.html', {
-            'order': order,
-            'payment_id': payment_id,
-        })
-    except Exception as e:
-        html_content = f"Thank you for your payment! Your order #{order.id} has been placed. Payment ID: {payment_id}."
-        
-    email = EmailMessage(
-        subject=subject,
-        body=html_content,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[order.email],
-    )
-    email.content_subtype = "html"
-    
-    # Generate the receipt text
-    receipt_text = f"""==================================================
-                 PAYMENT RECEIPT
-==================================================
-Order ID:        #{order.id}
-Transaction ID:  {payment_id}
-Order Date:      {order.created_at.strftime('%B %d, %Y, %I:%M %p')}
-
-Customer Details:
------------------
-Name:            {order.name}
-Email:           {order.email}
-Phone:           {order.phone}
-
-Shipping Address:
------------------
-{order.address}
-{order.city}, {order.state} - {order.pincode}
-
-Items Purchased:
-----------------
-"""
-    for item in order.items.all():
-        receipt_text += f"- {item.product.name:<30} Qty: {item.quantity:<5} Price: ₹{item.price:<8} Subtotal: ₹{item.get_subtotal()}\n"
-
-    receipt_text += f"""
-Pricing Summary:
-----------------
-Total Amount Paid: ₹{order.total_price} (INR)
-
-==================================================
-Thank you for your purchase with PickUp Store!
-==================================================
-"""
-    # Attach plain text receipt file
-    email.attach(f"receipt_order_{order.id}.txt", receipt_text, "text/plain")
-    
-    try:
-        email.send(fail_silently=False)
-    except Exception as e:
-        pass
-
-
 @login_required(login_url='login')
 def checkout(request):
     import razorpay
@@ -467,20 +412,21 @@ def checkout(request):
         razorpay_order_id = request.POST.get('razorpay_order_id')
         razorpay_signature = request.POST.get('razorpay_signature')
         
-        if not razorpay_payment_id or not razorpay_order_id or not razorpay_signature:
+        payment_fields_present = bool(razorpay_payment_id or razorpay_order_id or razorpay_signature)
+        if payment_fields_present and not all([razorpay_payment_id, razorpay_order_id, razorpay_signature]):
             messages.error(request, "Payment failed or was not completed. Please try again.")
             return redirect('checkout')
-            
-        # 3. Verify Payment Signature
-        try:
-            client.utility.verify_payment_signature({
-                'razorpay_order_id': razorpay_order_id,
-                'razorpay_payment_id': razorpay_payment_id,
-                'razorpay_signature': razorpay_signature
-            })
-        except Exception as e:
-            messages.error(request, f"Payment verification failed: {str(e)}")
-            return redirect('checkout')
+
+        if payment_fields_present:
+            try:
+                client.utility.verify_payment_signature({
+                    'razorpay_order_id': razorpay_order_id,
+                    'razorpay_payment_id': razorpay_payment_id,
+                    'razorpay_signature': razorpay_signature
+                })
+            except Exception as e:
+                messages.error(request, f"Payment verification failed: {str(e)}")
+                return redirect('checkout')
 
         # 4. Extract billing details
         name = request.POST.get('name')
@@ -526,7 +472,7 @@ def checkout(request):
         send_order_success_email(order, razorpay_payment_id)
         
         messages.success(request, "Order Placed Successfully! Your receipt has been emailed to you.")
-        return redirect('orders')
+        return redirect('order_detail', order.id)
         
     # GET Request: Initialize Razorpay order for the checkout modal popup
     razorpay_order_id = None
@@ -692,10 +638,146 @@ def edit_profile(request):
 
 
 
+def get_user_orders_queryset(request):
+    queryset = (
+        Order.objects.filter(user=request.user)
+        .prefetch_related('items__product')
+        .order_by('-created_at')
+    )
+
+    query = request.GET.get('q', '').strip() or request.GET.get('query', '').strip()
+    start_date = request.GET.get('start_date', '').strip()
+    end_date = request.GET.get('end_date', '').strip()
+    product_name = request.GET.get('product_name', '').strip()
+
+    if query:
+        try:
+            order_id = int(query)
+        except ValueError:
+            order_id = None
+
+        if order_id is not None:
+            queryset = queryset.filter(Q(id=order_id) | Q(tracking_number__icontains=query))
+        else:
+            queryset = queryset.filter(Q(tracking_number__icontains=query))
+
+    if start_date:
+        queryset = queryset.filter(created_at__date__gte=start_date)
+
+    if end_date:
+        queryset = queryset.filter(created_at__date__lte=end_date)
+
+    if product_name:
+        queryset = queryset.filter(items__product__name__icontains=product_name)
+
+    active_filters = {
+        'q': query,
+        'query': query,
+        'start_date': start_date,
+        'end_date': end_date,
+        'product_name': product_name,
+    }
+
+    return queryset.distinct(), active_filters
+
+
+class MyOrdersView(LoginRequiredMixin, View):
+    login_url = 'login'
+    template_name = 'my_orders.html'
+
+    def get(self, request, *args, **kwargs):
+        queryset, active_filters = get_user_orders_queryset(request)
+        return render(request, self.template_name, {
+            'orders': queryset,
+            'active_filters': active_filters,
+        })
+
+
+my_orders = MyOrdersView.as_view()
+
+
+@login_required(login_url='login')
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    return render(request, 'order_detail.html', {'order': order})
+
+
+@login_required(login_url='login')
+def invoice_preview(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    context = {
+        'order': order,
+        'items': order.items.all(),
+        'reference_id': f'PKU-{order.id}',
+        'customer_name': order.name,
+        'delivery_address': f"{order.address}\n{order.city}, {order.state} - {order.pincode}",
+        'email': order.email,
+        'phone': order.phone,
+        'alt_phone': order.alternate_phone or 'N/A',
+        'total_cost': order.total_price,
+    }
+    return render(request, 'invoice_template.html', context)
+
+
+@login_required(login_url='login')
+def invoice_download(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    context = {
+        'order': order,
+        'items': order.items.all(),
+        'reference_id': f'PKU-{order.id}',
+        'customer_name': order.name,
+        'delivery_address': f"{order.address}\n{order.city}, {order.state} - {order.pincode}",
+        'email': order.email,
+        'phone': order.phone,
+        'alt_phone': order.alternate_phone or 'N/A',
+        'total_cost': order.total_price,
+    }
+    html_string = render_to_string('invoice_template.html', context)
+
+    from xhtml2pdf import pisa
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{order.id}.pdf"'
+    pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse('PDF generation failed', status=500)
+
+    return response
+
+
+@login_required(login_url='login')
+def delete_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    if order.status == 'Confirmed':
+        for item in order.items.all():
+            item.product.quantity += item.quantity
+            item.product.save()
+
+        order.status = 'Cancelled'
+        order.save()
+        messages.success(request, f'Order #PKU-{order.id} has been cancelled successfully.')
+    else:
+        messages.info(request, f'Order #PKU-{order.id} is already {order.status.lower()}.')
+    return redirect('my_orders')
+
+
+@login_required(login_url='login')
+def order_delete(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order.delete()
+    messages.success(request, 'Order successfully deleted.')
+    return redirect('my_orders')
+
+
 @login_required(login_url='login')
 def orders(request):
-    user_orders = Order.objects.filter(user=request.user).prefetch_related('items__product').order_by('-created_at')
-    return render(request, 'orders.html', {'orders': user_orders})
+    queryset, active_filters = get_user_orders_queryset(request)
+    return render(request, 'orders.html', {
+        'orders': queryset,
+        'active_filters': active_filters,
+    })
 
 
 @login_required(login_url='login')
@@ -705,7 +787,7 @@ def cancel_order(request, order_id):
         messages.error(request, "Order not found.")
         return redirect('orders')
         
-    if order.status == 'Pending':
+    if order.status == 'Confirmed':
         # Restore product stock
         for item in order.items.all():
             item.product.quantity += item.quantity
@@ -715,7 +797,7 @@ def cancel_order(request, order_id):
         order.save()
         messages.success(request, f"Order #PKU-{order.id} has been cancelled successfully.")
     else:
-        messages.error(request, f"Order #PKU-{order.id} cannot be cancelled as its status is '{order.status}'. Only pending orders can be cancelled.")
+        messages.error(request, f"Order #PKU-{order.id} cannot be cancelled as its status is '{order.status}'. Only confirmed orders can be cancelled.")
         
     return redirect('orders')
 

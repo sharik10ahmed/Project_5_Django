@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Order Status - PickUp
+{% endblock %}
+
+{% block content %}
+{% include 'page_header.html' with page_title='Order Status' page_description='Thank you for your purchase. Here are your order details.' %}
+
+<div class="container py-5">
+    <div class="row justify-content-between align-items-center mb-4">
+        <div class="col-auto">
+            <h3 class="fw-bold mb-0" style="color: #001a4d;">Order Details</h3>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'my_orders' %}" class="btn btn-outline-primary btn-sm" style="border-radius: 10px;">Go to My Orders</a>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+                        <div>
+                            <h3 class="fw-bold mb-1" style="color: #001a4d;">#PKU-{{ order.id }}</h3>
+                            <p class="text-muted mb-0">Placed on {{ order.created_at|date:"d M Y, h:i A" }}</p>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <a href="{% url 'invoice_preview' order.id %}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">Preview</a>
+                            <a href="{% url 'invoice_download' order.id %}" class="btn btn-sm btn-outline-secondary">Download</a>
+                            <form method="post" action="{% url 'delete_order' order.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                            </form>
+                            {% if order.status == 'Confirmed' %}
+                                <span class="badge px-3 py-2 bg-success text-white fw-bold" style="border-radius: 20px;">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Confirmed
+                                </span>
+                            {% elif order.status == 'Shipped' %}
+                                <span class="badge px-3 py-2 bg-info text-white fw-bold" style="border-radius: 20px;">
+                                    <i class="bi bi-truck me-1"></i> Shipped
+                                </span>
+                            {% elif order.status == 'Delivered' %}
+                                <span class="badge px-3 py-2 bg-success text-white fw-bold" style="border-radius: 20px;">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Delivered
+                                </span>
+                            {% else %}
+                                <span class="badge px-3 py-2 bg-danger text-white fw-bold" style="border-radius: 20px;">
+                                    <i class="bi bi-x-circle-fill me-1"></i> Cancelled
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="p-4 rounded-4" style="background-color: #f8fafc; border: 1px solid rgba(0,0,0,0.03);">
+                                <h6 class="fw-bold mb-3 text-uppercase tracking-wider text-muted" style="font-size: 0.8rem; letter-spacing: 1px;">Delivery Address</h6>
+                                <p class="mb-1 fw-bold text-dark">{{ order.name }}</p>
+                                <p class="mb-0 text-muted">{{ order.address }}, {{ order.city }}, {{ order.state }} - {{ order.pincode }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-4 rounded-4" style="background-color: #f8fafc; border: 1px solid rgba(0,0,0,0.03);">
+                                <h6 class="fw-bold mb-3 text-uppercase tracking-wider text-muted" style="font-size: 0.8rem; letter-spacing: 1px;">Contact</h6>
+                                <p class="mb-1"><strong>Email:</strong> {{ order.email }}</p>
+                                <p class="mb-0"><strong>Phone:</strong> {{ order.phone }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle table-borderless">
+                            <thead>
+                                <tr class="border-bottom text-muted" style="font-size: 0.85rem;">
+                                    <th scope="col" style="padding-bottom: 12px;">Product</th>
+                                    <th scope="col" class="text-center" style="padding-bottom: 12px;">Price</th>
+                                    <th scope="col" class="text-center" style="padding-bottom: 12px;">Qty</th>
+                                    <th scope="col" class="text-end" style="padding-bottom: 12px;">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                    <tr class="border-bottom">
+                                        <td class="py-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="rounded-3 bg-light d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                                    <i class="bi bi-bag text-muted"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 fw-semibold text-dark">{{ item.product.name }}</h6>
+                                                    <small class="text-muted">{{ item.product.category.name }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center py-3 text-muted">₹{{ item.price }}</td>
+                                        <td class="text-center py-3">{{ item.quantity }}</td>
+                                        <td class="text-end py-3 fw-bold text-dark">₹{{ item.get_subtotal }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <div class="text-end">
+                            <p class="mb-1 text-muted">Total Amount</p>
+                            <h4 class="fw-bold mb-0" style="color: #001a4d;">₹{{ order.total_price }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

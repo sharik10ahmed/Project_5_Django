@@ -1,7 +1,11 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.urls import path, reverse
+from django.utils.html import format_html
 
-from .models import User, Category, Product, Announcement, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem
+from .models import User, Category, Product, Inventory, Announcement, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem
 
 
 
@@ -203,7 +207,7 @@ class ProductAdmin(admin.ModelAdmin):
     model = Product
 
     list_display = (
-        'name',
+        'product_with_sku',
         'category',
         'price',
         'discount_price',
@@ -220,6 +224,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     search_fields = (
         'name',
+        'sku',
         'description'
     )
 
@@ -272,9 +277,99 @@ class ProductAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = (
+        'sku',
         'created_at',
         'updated_at'
     )
+
+    def product_with_sku(self, obj):
+        if obj.sku:
+            return f'{obj.name} {obj.sku}'
+        return obj.name
+
+    product_with_sku.short_description = 'Product Name'
+
+
+@admin.register(Inventory)
+class InventoryAdmin(admin.ModelAdmin):
+    model = Inventory
+
+    list_display = ('image_thumbnail', 'product_with_sku', 'quantity', 'action')
+    search_fields = ('name', 'sku')
+    list_filter = ('is_active', 'category')
+    ordering = ('name',)
+
+    readonly_fields = ('sku',)
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                '<int:object_id>/adjust-stock/',
+                self.admin_site.admin_view(self.adjust_stock_view),
+                name='inventory-adjust-stock',
+            ),
+        ]
+        return custom_urls + urls
+
+    def product_with_sku(self, obj):
+        if obj.sku:
+            return f'{obj.name} {obj.sku}'
+        return obj.name
+
+    product_with_sku.short_description = 'Product Name'
+
+    def image_thumbnail(self, obj):
+        if obj.image and getattr(obj.image, 'url', None):
+            return format_html(
+                '<img src="{}" alt="{}" style="width:60px;height:60px;object-fit:cover;border-radius:4px;" />',
+                obj.image.url,
+                obj.name,
+            )
+        return '-'
+
+    image_thumbnail.short_description = 'Image'
+
+    def adjust_stock_view(self, request, object_id):
+        product = get_object_or_404(Product, pk=object_id)
+        qty_value = request.GET.get('qty', '1')
+
+        try:
+            qty_value = int(qty_value)
+        except (TypeError, ValueError):
+            qty_value = 1
+
+        if qty_value < 1:
+            qty_value = 1
+
+        if request.GET.get('action') == 'subtract':
+            new_quantity = max(0, product.quantity - qty_value)
+            action_label = 'removed from'
+        else:
+            new_quantity = product.quantity + qty_value
+            action_label = 'added to'
+
+        product.quantity = new_quantity
+        product.save(update_fields=['quantity'])
+
+        messages.success(
+            request,
+            f'Stock {action_label} {product.name} is now {product.quantity}.',
+        )
+        return HttpResponseRedirect(reverse('admin:PickUp_inventory_changelist'))
+
+    def action(self, obj):
+        return format_html(
+            '<div style="display:flex;gap:4px;align-items:center;">'
+            '<input type="number" id="qty_{id}" value="1" min="1" style="width:60px;" />'
+            '<button type="button" onclick="window.location.href=\'{id}/adjust-stock/?action=add&qty=\' + document.getElementById(\'qty_{id}\').value;" title="Add stock">+</button>'
+            '<button type="button" onclick="window.location.href=\'{id}/adjust-stock/?action=subtract&qty=\' + document.getElementById(\'qty_{id}\').value;" title="Subtract stock">-</button>'
+            '</div>',
+            id=obj.id,
+        )
+
+    action.short_description = 'Action'
+
 
 @admin.register(Announcement)
 class AnnouncementAdmin(admin.ModelAdmin):

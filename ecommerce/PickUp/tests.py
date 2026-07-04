@@ -92,6 +92,20 @@ class CartAndWishlistTests(TestCase):
             is_active=True
         )
 
+    def test_product_sku_is_generated_when_missing(self):
+        product = Product.objects.create(
+            name='Wireless Mouse',
+            slug='wireless-mouse',
+            category=self.category,
+            price=999.00,
+            quantity=3,
+            is_active=True
+        )
+
+        self.assertTrue(product.sku)
+        self.assertTrue(product.sku.startswith('ELEC') or product.sku.startswith('ELECT'))
+        self.assertEqual(product.sku, f"{product.sku.split('-')[0]}-{product.pk:05d}")
+
     def test_anonymous_user_cannot_add_to_cart(self):
         response = self.client.get(reverse('add_to_cart', args=[self.product1.id]))
         # Should redirect to login

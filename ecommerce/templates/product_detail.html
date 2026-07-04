@@ -331,7 +331,7 @@
 
                 <!-- Product Name -->
                 <h1 class="fw-bold mb-3" style="color: var(--dark-navy); font-size: 2.2rem;">
-                    {{ product.name }}
+                    {{ product.name }}{% if product.sku %} {{ product.sku }}{% endif %}
                 </h1>
 
                 <!-- Ratings Overlay (Premium Aesthetic) -->

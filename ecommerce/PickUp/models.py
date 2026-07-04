@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 
 from django.contrib.auth.models import (
     AbstractBaseUser,
@@ -315,6 +316,13 @@ class Category(models.Model):
 
 class Product(models.Model):
 
+    sku = models.CharField(
+        max_length=50,
+        unique=True,
+        blank=True,
+        null=True
+    )
+
     name = models.CharField(
         max_length=255,
         unique=True
@@ -375,8 +383,44 @@ class Product(models.Model):
         verbose_name_plural = "Products"
         ordering = ['-created_at']
 
+    def _generate_sku(self):
+        if self.category_id:
+            prefix = slugify(self.category.name or self.category.slug or 'product')[:4].upper() or 'PROD'
+        else:
+            prefix = 'PROD'
+
+        base_sku = f"{prefix}-{self.pk:05d}" if self.pk else f"{prefix}-00000"
+        sku = base_sku
+        suffix = 1
+
+        while Product.objects.filter(sku=sku).exclude(pk=self.pk).exists():
+            sku = f"{base_sku}-{suffix}"
+            suffix += 1
+
+        return sku
+
+    def save(self, *args, **kwargs):
+        if not self.sku:
+            if self.pk:
+                self.sku = self._generate_sku()
+            else:
+                super().save(*args, **kwargs)
+                self.sku = self._generate_sku()
+                super().save(update_fields=['sku'])
+                return
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
+        if self.sku:
+            return f"{self.name} {self.sku}"
         return self.name
+
+
+class Inventory(Product):
+    class Meta:
+        proxy = True
+        verbose_name_plural = 'Inventory'
 
 
 # Announcement Model

@@ -497,13 +497,17 @@
                 <!-- Ratings Overlay (Premium Aesthetic) -->
                 <div class="d-flex align-items-center gap-2 mb-4">
                     <div class="text-warning">
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-half"></i>
+                        {% with rating_percent=average_rating|default:0|floatformat:0 %}
+                            {% for i in '12345' %}
+                                {% if forloop.counter <= average_rating|floatformat:0 %}
+                                    <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                    <i class="bi bi-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        {% endwith %}
                     </div>
-                    <span class="small fw-semibold text-secondary">(4.5 Rating / 148 reviews)</span>
+                    <span class="small fw-semibold text-secondary">({% if total_reviews > 0 %}{{ average_rating|floatformat:1 }}{% else %}0.0{% endif %} Rating / {{ total_reviews }} reviews)</span>
                 </div>
 
                 <!-- Pricing Section -->

@@ -369,6 +369,26 @@
         background-color: var(--primary-orange);
     }
 
+    .star-rating-display {
+        position: relative;
+        display: inline-block;
+        line-height: 1;
+    }
+
+    .star-rating-display .star-base,
+    .star-rating-display .star-overlay {
+        display: flex;
+        gap: 0.15rem;
+    }
+
+    .star-rating-display .star-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
     .review-star-btn {
         border: none;
         background: transparent;
@@ -496,17 +516,22 @@
 
                 <!-- Ratings Overlay (Premium Aesthetic) -->
                 <div class="d-flex align-items-center gap-2 mb-4">
-                    <div class="text-warning">
-                        {% with rating_percent=average_rating|default:0|floatformat:0 %}
-                            {% for i in '12345' %}
-                                {% if forloop.counter <= average_rating|floatformat:0 %}
-                                    <i class="bi bi-star-fill"></i>
-                                {% else %}
-                                    <i class="bi bi-star"></i>
-                                {% endif %}
-                            {% endfor %}
-                        {% endwith %}
-                    </div>
+                    <span class="star-rating-display text-warning">
+                        <span class="star-base" aria-hidden="true">
+                            <i class="bi bi-star"></i>
+                            <i class="bi bi-star"></i>
+                            <i class="bi bi-star"></i>
+                            <i class="bi bi-star"></i>
+                            <i class="bi bi-star"></i>
+                        </span>
+                        <span class="star-overlay text-warning" style="width: {{ average_rating_percentage }}%;" aria-hidden="true">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                        </span>
+                    </span>
                     <span class="small fw-semibold text-secondary">({% if total_reviews > 0 %}{{ average_rating|floatformat:1 }}{% else %}0.0{% endif %} Rating / {{ total_reviews }} reviews)</span>
                 </div>
 

@@ -1069,6 +1069,7 @@ def product_detail(request, product_id):
     feedbacks = Feedback.objects.filter(product=product_obj, status='Approved').order_by('-created_at')
     total_reviews = feedbacks.count()
     average_rating = round(feedbacks.aggregate(Avg('stars'))['stars__avg'] or 0, 1)
+    average_rating_percentage = (average_rating / 5) * 100 if average_rating else 0
 
     star_percentages = {}
     for star_level in range(5, 0, -1):
@@ -1099,6 +1100,7 @@ def product_detail(request, product_id):
             'feedbacks': feedbacks,
             'total_reviews': total_reviews,
             'average_rating': average_rating,
+            'average_rating_percentage': average_rating_percentage,
             'star_percentages': star_percentages,
             'in_wishlist': in_wishlist,
             'wishlist_product_ids': wishlist_product_ids,

@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import path, reverse
 from django.utils.html import format_html
 
-from .models import User, Category, Product, Inventory, Announcement, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem
+from .models import User, Category, Product, Inventory, Announcement, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem, Feedback
 
 
 
@@ -288,6 +288,50 @@ class ProductAdmin(admin.ModelAdmin):
         return obj.name
 
     product_with_sku.short_description = 'Product Name'
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('product_name', 'stars', 'status', 'action')
+    list_filter = ('status', 'stars', 'created_at')
+    search_fields = ('product__name', 'customer_message')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'updated_at')
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('<int:object_id>/approve/', self.admin_site.admin_view(self.approve_feedback), name='feedback-approve'),
+            path('<int:object_id>/reject/', self.admin_site.admin_view(self.reject_feedback), name='feedback-reject'),
+        ]
+        return custom_urls + urls
+
+    def product_name(self, obj):
+        return obj.product.name
+
+    product_name.short_description = 'Product Name'
+
+    def action(self, obj):
+        view_link = format_html('<a href="{}">View</a>', reverse('admin:PickUp_feedback_change', args=[obj.pk]))
+        approve_link = format_html('<a href="{}">Approve</a>', reverse('admin:feedback-approve', args=[obj.pk]))
+        reject_link = format_html('<a href="{}">Reject</a>', reverse('admin:feedback-reject', args=[obj.pk]))
+        return format_html('{} | {} | {}', view_link, approve_link, reject_link)
+
+    action.short_description = 'Action'
+
+    def approve_feedback(self, request, object_id):
+        feedback = get_object_or_404(Feedback, pk=object_id)
+        feedback.status = 'Approved'
+        feedback.save(update_fields=['status'])
+        messages.success(request, f'Feedback for {feedback.product.name} approved.')
+        return HttpResponseRedirect(reverse('admin:PickUp_feedback_changelist'))
+
+    def reject_feedback(self, request, object_id):
+        feedback = get_object_or_404(Feedback, pk=object_id)
+        feedback.status = 'Pending'
+        feedback.save(update_fields=['status'])
+        messages.success(request, f'Feedback for {feedback.product.name} marked as pending.')
+        return HttpResponseRedirect(reverse('admin:PickUp_feedback_changelist'))
 
 
 @admin.register(Inventory)

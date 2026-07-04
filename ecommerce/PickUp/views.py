@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.views import View
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -18,7 +18,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .models import User, Category, Product, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem
+from .models import User, Category, Product, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem, Feedback
 from .email_utils import send_order_success_email
 
 from .forms import UserProfileForm
@@ -1035,27 +1035,71 @@ def product_detail(request, product_id):
     if not product_obj:
         messages.error(request, "Product not found or inactive.")
         return redirect('product')
-        
+
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            messages.error(request, 'Please log in to submit a review.')
+            return redirect(f"{reverse('login')}?next={reverse('product_detail', args=[product_obj.id])}")
+
+        customer_name = getattr(request.user, 'get_full_name', lambda: None)() or getattr(request.user, 'full_name', None) or request.user.username
+        customer_message = request.POST.get('customer_message', '').strip()
+        review_title = request.POST.get('review_title', '').strip()
+        stars_value = request.POST.get('stars', '5').strip()
+
+        if customer_message:
+            try:
+                stars = int(stars_value)
+            except (TypeError, ValueError):
+                stars = 5
+
+            Feedback.objects.create(
+                product=product_obj,
+                customer_name=customer_name,
+                review_title=review_title or None,
+                customer_message=customer_message,
+                stars=max(1, min(5, stars)),
+                status='Pending'
+            )
+            messages.success(request, 'Your feedback has been submitted and is pending approval.')
+        else:
+            messages.error(request, 'Please enter a review message before submitting.')
+
+        return redirect('product_detail', product_id=product_obj.id)
+
+    feedbacks = Feedback.objects.filter(product=product_obj, status='Approved').order_by('-created_at')
+    total_reviews = feedbacks.count()
+    average_rating = round(feedbacks.aggregate(Avg('stars'))['stars__avg'] or 0, 1)
+
+    star_percentages = {}
+    for star_level in range(5, 0, -1):
+        count = feedbacks.filter(stars=star_level).count()
+        percentage = round((count / total_reviews) * 100, 1) if total_reviews else 0
+        star_percentages[star_level] = percentage
+
     in_wishlist = False
     wishlist_product_ids = []
     if request.user.is_authenticated:
         in_wishlist = Wishlist.objects.filter(user=request.user, product=product_obj).exists()
         wishlist_product_ids = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
-        
+
     # Get related products (same category, excluding this one)
     related_products = Product.objects.filter(category=product_obj.category, is_active=True).exclude(id=product_obj.id)[:4]
-    
+
     # If less than 4, fill with other active products
     related_count = related_products.count()
     if related_count < 4:
         fill_products = Product.objects.filter(is_active=True).exclude(id=product_obj.id).exclude(id__in=[p.id for p in related_products])[:4 - related_count]
         related_products = list(related_products) + list(fill_products)
-        
+
     return render(
         request,
         'product_detail.html',
         {
             'product': product_obj,
+            'feedbacks': feedbacks,
+            'total_reviews': total_reviews,
+            'average_rating': average_rating,
+            'star_percentages': star_percentages,
             'in_wishlist': in_wishlist,
             'wishlist_product_ids': wishlist_product_ids,
             'related_products': related_products,

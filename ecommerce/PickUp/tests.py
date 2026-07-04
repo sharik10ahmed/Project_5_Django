@@ -62,7 +62,64 @@ class ContactUsTests(TestCase):
         self.assertEqual(ContactMessage.objects.count(), 0)
 
 
-from .models import Cart, CartItem, Wishlist, Product, Category, User, Order, OrderItem
+from .models import Cart, CartItem, Wishlist, Product, Category, User, Order, OrderItem, Feedback
+
+class FeedbackSystemTests(TestCase):
+    def setUp(self):
+        self.category = Category.objects.create(name='Electronics', slug='electronics')
+        self.product = Product.objects.create(
+            name='Gaming Headset',
+            slug='gaming-headset',
+            category=self.category,
+            price=1999.00,
+            quantity=10,
+            is_active=True
+        )
+
+    def test_product_detail_page_shows_approved_feedback_and_accepts_new_submission(self):
+        Feedback.objects.create(
+            product=self.product,
+            customer_message='Great sound and comfy fit.',
+            stars=5,
+            status='Approved'
+        )
+        user = User.objects.create_user(
+            username='reviewer',
+            email='reviewer@example.com',
+            full_name='Review User',
+            password='testpassword'
+        )
+        self.client.login(username='reviewer', password='testpassword')
+
+        response = self.client.get(reverse('product_detail', args=[self.product.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Customer reviews')
+        self.assertContains(response, 'Great sound and comfy fit.')
+        self.assertContains(response, 'Gaming Headset')
+
+        post_response = self.client.post(reverse('product_detail', args=[self.product.id]), {
+            'customer_message': 'Excellent build quality.',
+            'stars': '4',
+            'review_title': 'Very comfortable',
+        })
+
+        self.assertRedirects(post_response, reverse('product_detail', args=[self.product.id]))
+        self.assertEqual(Feedback.objects.filter(product=self.product).count(), 2)
+        pending_feedback = Feedback.objects.get(product=self.product, customer_message='Excellent build quality.')
+        self.assertEqual(pending_feedback.status, 'Pending')
+        self.assertEqual(pending_feedback.stars, 4)
+        self.assertEqual(pending_feedback.customer_name, user.full_name)
+
+    def test_product_detail_page_exposes_review_aggregate_context(self):
+        Feedback.objects.create(product=self.product, customer_name='Alice', customer_message='Really good', stars=5, status='Approved')
+        Feedback.objects.create(product=self.product, customer_name='Bob', customer_message='Okay', stars=1, status='Approved')
+
+        response = self.client.get(reverse('product_detail', args=[self.product.id]))
+
+        self.assertEqual(response.context['total_reviews'], 2)
+        self.assertEqual(response.context['average_rating'], 3.0)
+        self.assertEqual(response.context['star_percentages'][5], 50.0)
+        self.assertEqual(response.context['star_percentages'][1], 50.0)
 
 class MyOrdersViewTests(TestCase):
     def setUp(self):

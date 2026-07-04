@@ -274,6 +274,166 @@
         padding-right: 0;
         color: #555;
     }
+
+    .feedback-card {
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        padding: 1.2rem 1.25rem;
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+        font-family: 'Poppins', 'Inter', sans-serif;
+        margin-bottom: 1rem;
+    }
+
+    .feedback-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2c7a7b, #4c6ef5);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .feedback-reviewer {
+        font-weight: 700;
+        color: var(--dark-navy);
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .feedback-stars-row {
+        color: #ffb400;
+        font-size: 1rem;
+        letter-spacing: 0.08em;
+        margin-top: 0.55rem;
+        margin-bottom: 0.45rem;
+    }
+
+    .feedback-meta {
+        color: #8a8a8a;
+        font-size: 0.95rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .feedback-meta .verified {
+        color: var(--primary-orange);
+        font-weight: 700;
+        margin-left: 0.35rem;
+    }
+
+    .feedback-message {
+        color: #444;
+        line-height: 1.7;
+        margin-bottom: 0.35rem;
+        white-space: pre-line;
+    }
+
+    .reviews-shell {
+        display: grid;
+        grid-template-columns: minmax(260px, 320px) 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .reviews-summary-card {
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        padding: 1.25rem;
+        background: linear-gradient(135deg, #fffaf5 0%, #ffffff 100%);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+        font-family: 'Poppins', 'Inter', sans-serif;
+    }
+
+    .review-progress-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .review-progress-row .progress {
+        height: 8px;
+        flex: 1;
+        border-radius: 999px;
+        background-color: #f1f1f1;
+    }
+
+    .review-progress-row .progress-bar {
+        background-color: var(--primary-orange);
+    }
+
+    .review-star-btn {
+        border: none;
+        background: transparent;
+        font-size: 1.6rem;
+        color: #ddd;
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.2s ease;
+    }
+
+    .review-star-btn.active,
+    .review-star-btn:hover {
+        color: #ffb400;
+    }
+
+    .review-form-card {
+        display: none;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        padding: 1.25rem;
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+        margin-top: 1rem;
+        font-family: 'Poppins', 'Inter', sans-serif;
+    }
+
+    .review-form-card.show {
+        display: block;
+    }
+
+    @media (max-width: 992px) {
+        .reviews-shell {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .feedback-form-card {
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        padding: 1.4rem;
+        background: linear-gradient(135deg, #fff7f0 0%, #ffffff 100%);
+        box-shadow: 0 8px 24px rgba(255, 102, 0, 0.08);
+        font-family: 'Poppins', 'Inter', sans-serif;
+    }
+
+    .feedback-stars {
+        color: #ffb400;
+        letter-spacing: 0.1em;
+    }
+
+    .feedback-submit-btn {
+        background-color: var(--primary-orange);
+        border: none;
+        color: #fff;
+        border-radius: 10px;
+        padding: 12px 22px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+    }
+
+    .feedback-submit-btn:hover {
+        background-color: var(--accent-hover);
+        color: #fff;
+        transform: translateY(-2px);
+    }
 </style>
 
 <div class="container py-4">
@@ -494,6 +654,107 @@
         </div>
     </div>
 
+    <!-- Customer Reviews Section -->
+    <div class="mt-5 pt-5 border-top" style="border-color: rgba(0, 0, 0, 0.05) !important;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0" style="color: var(--dark-navy);">Customer reviews</h3>
+            <span class="text-muted small">{{ total_reviews }} global ratings</span>
+        </div>
+
+        <div class="reviews-shell">
+            <div class="reviews-summary-card">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="display-6 fw-bold" style="color: var(--dark-navy);">{{ average_rating|floatformat:1 }}</div>
+                    <div>
+                        <div class="feedback-stars-row mb-1">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                        </div>
+                        <div class="text-muted small">{{ total_reviews }} global ratings</div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    {% for star_level, percentage in star_percentages.items %}
+                        <div class="review-progress-row">
+                            <span class="small fw-semibold text-secondary">{{ star_level }} star</span>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: {{ percentage }}%;"></div>
+                            </div>
+                            <span class="small text-muted">{{ percentage|floatformat:0 }}%</span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if user.is_authenticated %}
+                    <button type="button" class="btn feedback-submit-btn w-100 mt-3" id="toggleReviewFormBtn">Write a product review</button>
+                {% else %}
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn feedback-submit-btn w-100 mt-3 d-inline-block text-center">Write a product review</a>
+                {% endif %}
+
+                <div id="reviewFormCard" class="review-form-card">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="stars" id="hiddenReviewStars" value="5">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Rating</label>
+                            <div class="d-flex gap-2" id="interactiveStars">
+                                <button type="button" class="review-star-btn active" data-value="1" aria-label="1 star">★</button>
+                                <button type="button" class="review-star-btn active" data-value="2" aria-label="2 stars">★</button>
+                                <button type="button" class="review-star-btn active" data-value="3" aria-label="3 stars">★</button>
+                                <button type="button" class="review-star-btn active" data-value="4" aria-label="4 stars">★</button>
+                                <button type="button" class="review-star-btn active" data-value="5" aria-label="5 stars">★</button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="reviewTitle">Title your review</label>
+                            <input type="text" class="form-control" id="reviewTitle" name="review_title" placeholder="Great product!" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="reviewMessage">Your review</label>
+                            <textarea class="form-control" id="reviewMessage" name="customer_message" rows="5" required placeholder="Share your experience with this product..."></textarea>
+                        </div>
+                        <button type="submit" class="btn feedback-submit-btn w-100">Submit</button>
+                    </form>
+                </div>
+            </div>
+
+            <div>
+                {% if feedbacks %}
+                    {% for feedback in feedbacks %}
+                        <div class="feedback-card">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <div class="feedback-avatar" aria-label="{{ feedback.customer_name }} avatar">
+                                    {{ feedback.customer_name|make_list|first|upper }}
+                                </div>
+                                <div class="feedback-reviewer">{{ feedback.customer_name }}</div>
+                            </div>
+                            {% if feedback.review_title %}
+                                <div class="fw-bold mb-2" style="color: var(--dark-navy);">{{ feedback.review_title }}</div>
+                            {% endif %}
+                            <div class="feedback-stars-row" aria-label="{{ feedback.stars }} out of 5 stars">
+                                {% for _ in feedback.star_icons %}
+                                    <i class="bi bi-star-fill"></i>
+                                {% endfor %}
+                            </div>
+                            <div class="feedback-meta">
+                                Reviewed on {{ feedback.created_at|date:"d M Y" }} <span class="verified">| Verified Purchase</span>
+                            </div>
+                            <div class="feedback-message">{{ feedback.customer_message|linebreaksbr }}</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="feedback-card text-muted">
+                        No reviews yet. Be the first to review this product!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
     <!-- Related Products Section -->
     <div class="mt-5 pt-5 border-top" style="border-color: rgba(0, 0, 0, 0.05) !important;">
         <h3 class="fw-bold mb-4" style="color: var(--dark-navy);">
@@ -589,6 +850,31 @@
                 if (selectedSizeName) selectedSizeName.textContent = sizeValue;
             });
         });
+
+        // Review form toggle
+        const toggleReviewFormBtn = document.getElementById("toggleReviewFormBtn");
+        const reviewFormCard = document.getElementById("reviewFormCard");
+        if (toggleReviewFormBtn && reviewFormCard) {
+            toggleReviewFormBtn.addEventListener("click", function () {
+                reviewFormCard.classList.toggle("show");
+            });
+        }
+
+        const interactiveStars = document.getElementById("interactiveStars");
+        const hiddenReviewStars = document.getElementById("hiddenReviewStars");
+        if (interactiveStars && hiddenReviewStars) {
+            const starButtons = interactiveStars.querySelectorAll(".review-star-btn");
+            starButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    const value = this.getAttribute("data-value");
+                    hiddenReviewStars.value = value;
+                    starButtons.forEach(btn => btn.classList.remove("active"));
+                    for (let i = 0; i < value; i++) {
+                        starButtons[i].classList.add("active");
+                    }
+                });
+            });
+        }
 
         // Quantity selector
         const qtyDecrementBtn = document.getElementById("qtyDecrementBtn");

@@ -417,6 +417,37 @@ class Product(models.Model):
         return self.name
 
 
+class Feedback(models.Model):
+    STATUS_CHOICES = (
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+    )
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='feedbacks'
+    )
+    customer_name = models.CharField(max_length=100, default='Anonymous User')
+    review_title = models.CharField(max_length=255, blank=True, null=True)
+    customer_message = models.TextField()
+    stars = models.PositiveSmallIntegerField(default=5)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Feedback'
+
+    @property
+    def star_icons(self):
+        return range(self.stars)
+
+    def __str__(self):
+        return f"{self.product.name} - {self.stars} stars"
+
+
 class Inventory(Product):
     class Meta:
         proxy = True

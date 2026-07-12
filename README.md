@@ -1,6 +1,6 @@
 <div align="center">
   <img src="https://img.icons8.com/color/96/000000/django.png" alt="Django Logo"/>
-  <h1>🛍️ Nexus E-Commerce Engine</h1>
+  <h1>🛍️ PickUp E-Commerce Engine</h1>
   <p>
     <strong>A comprehensive, high-performance, and scalable e-commerce platform built on Django.</strong>
   </p>
@@ -15,7 +15,7 @@
 
 <br />
 
-> **Nexus** is a production-ready e-commerce solution engineered for reliability and user experience. Featuring advanced inventory management, automated PDF invoicing, and dynamic content rendering directly from the Django Admin interface.
+> **PickUp** is a production-ready e-commerce solution engineered for reliability and user experience. Featuring advanced inventory management, automated PDF invoicing, and dynamic content rendering directly from the Django Admin interface.
 
 ---
 

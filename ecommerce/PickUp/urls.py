@@ -33,6 +33,7 @@ urlpatterns =[
     path('our-vision/', our_vision, name='our_vision'),
     path('contact/', contact, name='contact'),
     path('product/<int:product_id>/', product_detail, name='product_detail'),
+    path('product/<int:product_id>/help/', product_help, name='product_help'),
     path('cart/add/<int:product_id>/', add_to_cart, name='add_to_cart'),
     path('cart/buy-now/<int:product_id>/', buy_now, name='buy_now'),
     path('cart/remove/<int:item_id>/', remove_from_cart, name='remove_from_cart'),

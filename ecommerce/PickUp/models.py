@@ -765,3 +765,19 @@ class OrderItem(models.Model):
 
     def get_subtotal(self):
         return self.price * self.quantity
+
+
+class ProductHelpQuery(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='help_queries')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_help_queries')
+    query = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Product Help Query"
+        verbose_name_plural = "Product Help Queries"
+
+    def __str__(self):
+        user_str = self.user.username if self.user else "Anonymous"
+        return f"Query on {self.product.name} by {user_str}"

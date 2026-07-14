@@ -18,7 +18,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .models import User, Category, Product, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem, Feedback
+from .models import User, Category, Product, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem, Feedback, ProductHelpQuery
 from .email_utils import send_order_success_email
 
 from .forms import UserProfileForm
@@ -1107,6 +1107,28 @@ def product_detail(request, product_id):
             'related_products': related_products,
         }
     )
+
+
+def product_help(request, product_id):
+    if not request.user.is_authenticated:
+        messages.error(request, "Please log in to submit a query.")
+        return redirect(f"{reverse('login')}?next={reverse('product_detail', args=[product_id])}")
+    
+    if request.method == 'POST':
+        product_obj = get_object_or_404(Product, id=product_id, is_active=True)
+        query_text = request.POST.get('query', '').strip()
+        if not query_text:
+            messages.error(request, "Query content cannot be empty.")
+        else:
+            ProductHelpQuery.objects.create(
+                product=product_obj,
+                user=request.user,
+                query=query_text
+            )
+            messages.success(request, "Your help query has been submitted successfully.")
+        return redirect('product_detail', product_id=product_id)
+    return redirect('product')
+
 
 
 def buy_now(request, product_id):

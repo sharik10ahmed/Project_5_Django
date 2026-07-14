@@ -62,7 +62,7 @@ class ContactUsTests(TestCase):
         self.assertEqual(ContactMessage.objects.count(), 0)
 
 
-from .models import Cart, CartItem, Wishlist, Product, Category, User, Order, OrderItem, Feedback
+from .models import Cart, CartItem, Wishlist, Product, Category, User, Order, OrderItem, Feedback, ProductHelpQuery
 
 class FeedbackSystemTests(TestCase):
     def setUp(self):
@@ -542,3 +542,38 @@ class CartAndWishlistTests(TestCase):
         self.assertEqual(cart_obj.get_subtotal(), 10000.00)
         self.assertEqual(cart_obj.get_delivery_charge(), 0)
         self.assertEqual(cart_obj.get_total_price(), 10000.00)
+
+
+class ProductHelpQueryTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser_help',
+            email='testuser_help@example.com',
+            full_name='Test User Help',
+            password='testpassword'
+        )
+        self.category = Category.objects.create(name='Electronics', slug='electronics')
+        self.product = Product.objects.create(
+            name='Test Phone Help',
+            slug='test-phone-help',
+            category=self.category,
+            price=10000.00,
+            quantity=5,
+            is_active=True
+        )
+
+    def test_anonymous_user_submitting_help_redirects_to_login(self):
+        response = self.client.post(reverse('product_help', args=[self.product.id]), {'query': 'Can you help me?'})
+        self.assertRedirects(response, reverse('login') + '?next=' + reverse('product_detail', args=[self.product.id]))
+        self.assertEqual(ProductHelpQuery.objects.count(), 0)
+
+    def test_authenticated_user_can_submit_help_query(self):
+        self.client.login(username='testuser_help', password='testpassword')
+        response = self.client.post(reverse('product_help', args=[self.product.id]), {'query': 'Does it support 5G?'})
+        self.assertRedirects(response, reverse('product_detail', args=[self.product.id]))
+        self.assertEqual(ProductHelpQuery.objects.count(), 1)
+        query = ProductHelpQuery.objects.first()
+        self.assertEqual(query.product, self.product)
+        self.assertEqual(query.user, self.user)
+        self.assertEqual(query.query, 'Does it support 5G?')
+

@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import path, reverse
 from django.utils.html import format_html
 
-from .models import User, Category, Product, Inventory, Announcement, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem, Feedback
+from .models import User, Category, Product, Inventory, Announcement, Gallery, TeamMember, ContactMessage, ContactConfig, Cart, CartItem, Wishlist, Order, OrderItem, Feedback, ProductHelpQuery
 
 
 
@@ -675,3 +675,11 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
     readonly_fields = ('user', 'total_price', 'created_at')
     list_editable = ('status',)
+
+
+@admin.register(ProductHelpQuery)
+class ProductHelpQueryAdmin(admin.ModelAdmin):
+    list_display = ('product', 'user', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('product__name', 'user__username', 'query')
+    readonly_fields = ('created_at',)

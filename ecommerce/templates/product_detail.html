@@ -335,6 +335,34 @@
         white-space: pre-line;
     }
 
+    .feedback-message-scrollable {
+        color: #444;
+        line-height: 1.7;
+        margin-bottom: 0.35rem;
+        white-space: pre-line;
+        max-height: 120px;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+
+    .feedback-message-scrollable::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .feedback-message-scrollable::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .feedback-message-scrollable::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+    }
+
+    .feedback-message-scrollable::-webkit-scrollbar-thumb:hover {
+        background: #888;
+    }
+
     .reviews-shell {
         display: grid;
         grid-template-columns: minmax(260px, 320px) 1fr;
@@ -802,7 +830,11 @@
                             <div class="feedback-meta">
                                 Reviewed on {{ feedback.created_at|date:"d M Y" }} <span class="verified">| Verified Purchase</span>
                             </div>
-                            <div class="feedback-message">{{ feedback.customer_message|linebreaksbr }}</div>
+                            {% if feedback.customer_message|length > 100 %}
+                                <div class="feedback-message-scrollable">{{ feedback.customer_message|linebreaksbr }}</div>
+                            {% else %}
+                                <div class="feedback-message">{{ feedback.customer_message|linebreaksbr }}</div>
+                            {% endif %}
                         </div>
                     {% endfor %}
                 {% else %}
